@@ -23,6 +23,7 @@ function AlexaOut ($speech, $card_title, $card_phrase, $reprompt_speech = null, 
 }
 
 // Define a function to create JSON for Alexa Flash Briefing skills
+// TODO: perhaps use this to announce count of seizures for the prior day (yesterday)?
 function BriefingOut ($uid, $update_date, $title_text, $main_text, $redirect_url = null) {
 
 	// Create the short array to return for Flash Briefing skills, JSON encode it, and return it

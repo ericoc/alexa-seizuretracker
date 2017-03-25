@@ -15,11 +15,6 @@ if ( (isset($input->session->user->userId)) && (!empty($input->session->user->us
 
 	// Get user "accessToken" from Alexa
 	if ( (isset($input->session->user->accessToken)) && (is_string($input->session->user->accessToken)) ) {
-		$user_token = get_user($input->session->user->accessToken);
-	}
-
-	// Continue if the user token is valid
-	if (check_user($user_token) === true) {
 
 		// Handle the event based on the intent sent from Alexa
 		$handle_seizure = handle_seizure($db_link, $user_id, $input->request->intent);

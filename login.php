@@ -7,10 +7,10 @@ function auth_user ($username, $password) {
 	require_once('.st.api.php');
 
 	// Set the SeizureTracker API URL to hit
-	$st_api['tokenurl'] = $st_api['baseurl'] . '/STUser/GetToken.php/JSON/' . $st_api['accesscode'] . '/' . $st_api['projectid'];
+	$st_api->tokenurl = $st_api->baseurl . '/STUser/GetToken.php/JSON/' . $st_api->accesscode . '/' . $st_api->projectid;
 
 	$c = curl_init();
-	curl_setopt($c, CURLOPT_URL, $st_api['tokenurl']);
+	curl_setopt($c, CURLOPT_URL, $st_api->tokenurl);
 	curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
 	curl_setopt($c, CURLOPT_USERAGENT, 'Alexa Authentication Development 1.0 / https://github.com/ericoc/alexa-seizuretracker');
 	curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 2);

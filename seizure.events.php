@@ -3,68 +3,33 @@
 //
 // Create a function to add a seizure
 //
-function add_seizure($db_link, $user_id, $intent) {
-
-	// Add seizure to database
-	$add_seizure = $db_link->prepare("INSERT INTO `seizures` VALUES (0, :user_id, NOW(), NULL)");
-	$add_seizure->bindValue(':user_id', $user_id, PDO::PARAM_INT);
-
-	// Return the seizure ID if it was successfully added!
-	if ($add_seizure->execute()) {
-		return $db_link->lastInsertId();
-
-	// Otherwise, something went wrong adding the seizure
-	} else {
-		return null;
-	}
+function add_seizure($api, $user_id, $intent) {
+	// TODO: Hit ST API and add a seizure
+	// return: true = success false = failed, null = unknown error
 }
 
 //
 // Create a function to update a seizure (marking it with an end date)
 //
-function update_seizure($db_link, $user_id) {
+function update_seizure($api, $user_id) {
 
-	// Find the most recent seizure for this user in the past five minutes that has a NULL end date
-	$find_seizure = $db_link->prepare("SELECT `seizure_id` FROM `seizures` WHERE `user_id` = :user_id AND `dt_started` > NOW() - INTERVAL 5 MINUTE AND `dt_ended` IS NULL LIMIT 1");
-	$find_seizure->bindValue(':user_id', $user_id, PDO::PARAM_INT);
-	$find_seizure->execute();
-	$result_count = $find_seizure->rowCount();
+/*
+	TODO: Hit ST API, find most recent seizure, and either:
+			1. update it with an end date OR
+			2. delete it, but create a new seizure with the old one's start date and an accurate end date
+	return: true = success false = failed, null = unknown error
+*/
 
-	// Found it, move on with updating the end date
-	if ($result_count === 1) {
-		$seizure = $find_seizure->fetch(PDO::FETCH_ASSOC);
-		$seizure_id = $seizure['seizure_id'];
-
-		// Update the seizures end date to the current time based on the seizures ID that we just got
-		$update_seizure = $db_link->prepare("UPDATE `seizures` SET `dt_ended` = NOW() WHERE `seizure_id` = :seizure_id AND `user_id` = :user_id");
-		$update_seizure->bindValue(':seizure_id', $seizure_id, PDO::PARAM_INT);
-		$update_seizure->bindValue(':user_id', $user_id, PDO::PARAM_INT);
-
-		// Seizure was successfully updated!
-		if ($update_seizure->execute()) {
-			return true;
-		} else {
-			return false;
-		}
-
-	// Otherwise, no seizure was found to update so this process failed
-	} else {
-		return null;
-	}
 }
 
 //
 // Create a function to count the number of seizures for a user today
 //
-function count_seizures($db_link, $user_id) {
+function count_seizures($api, $user_id) {
 
-	// Find seizures for current user that happened on the current day
-	$count_seizures = $db_link->prepare("SELECT `seizure_id` FROM `seizures` WHERE `user_id` = :user_id AND DATE(`dt_started`) = CURDATE()");
-	$count_seizures->bindValue(':user_id', $user_id, PDO::PARAM_INT);
-	$count_seizures->execute();
-	$seizure_count = $count_seizures->rowCount();
+	// TODO: Hit ST API and count seizures today!
 
-	// Return the number of rows (seizures) found
+	// Return the number of seizures found
 	if (is_int($seizure_count)) {
 		return $seizure_count;
 
@@ -77,13 +42,13 @@ function count_seizures($db_link, $user_id) {
 //
 // Create a function to handle a seizure sent from Alexa
 //
-function handle_seizure ($db_link, $user_id, $intent) {
+function handle_seizure ($api, $user_id, $intent) {
 
 	// Add a new seizure, if requested
 	if ($intent->name == 'LogSeizure') {
 
 		// Try to add the seizure
-		$add_seizure = add_seizure($db_link, $user_id, $intent);
+		$add_seizure = add_seizure($api, $user_id, $intent);
 
 		// If we got an ID back, it is numeric so adding the seizure was successful and we pass that along
 		if (is_numeric($add_seizure)) {
@@ -98,7 +63,7 @@ function handle_seizure ($db_link, $user_id, $intent) {
 	} elseif ($intent->name == 'UpdateSeizure') {
 
 		// Try to update the seizure
-		$update_seizure = update_seizure($db_link, $user_id, $intent);
+		$update_seizure = update_seizure($api, $user_id, $intent);
 
 		// All set; seizure was updated and marked as over
 		if ($update_seizure === true) {
@@ -117,7 +82,7 @@ function handle_seizure ($db_link, $user_id, $intent) {
 	} elseif ($intent->name == 'CountSeizures') {
 
 		// Get the count of the current users seizures today
-		$count_seizures = count_seizures($db_link, $user_id);
+		$count_seizures = count_seizures($api, $user_id);
 
 		// All set; return how many seizures were tracked today, using the users own words
 		if ($count_seizures > 0) {

@@ -1,7 +1,7 @@
 <?php
 
+require_once('.st.api.php');
 require_once('alexa.func.php');
-require_once('seizure.users.php');
 require_once('seizure.events.php');
 
 // Get the input from Alexa and JSON-decode it
@@ -17,7 +17,7 @@ if ( (isset($input->session->user->userId)) && (!empty($input->session->user->us
 	if ( (isset($input->session->user->accessToken)) && (is_string($input->session->user->accessToken)) ) {
 
 		// Handle the event based on the intent sent from Alexa
-		$handle_seizure = handle_seizure($db_link, $user_id, $input->request->intent);
+		$handle_seizure = handle_seizure($st_api, $input->session->user->accessToken, $input->request->intent);
 
 		// Set the message awkwardly
 		// (TODO: find a better way of doing this)
@@ -33,9 +33,6 @@ if ( (isset($input->session->user->userId)) && (!empty($input->session->user->us
 	} else {
 		$message = "Sorry. There was an error with your user account.";
 	}
-
-	// Disconnect from MySQL
-	$db_link = null;
 
 // Otherwise, invalid input gets a default set of instructions for using this Alexa Skill
 } else {

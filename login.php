@@ -55,6 +55,7 @@ if ( (isset($_POST['st_username'])) && (isset($_POST['st_password'])) && (!empty
 	// Handle successful authentication by redirecting the user back to Amazon/Alexa
 	} elseif ( (isset($auth_user)) && (is_string($auth_user)) ) {
 		$amazon_url = htmlspecialchars($_GET['redirect_uri']) . '#state=' . htmlspecialchars($_GET['state']) . '&access_token=' . $auth_user . '&token_type=Bearer';
+		error_log("Successful auth from $auth_user (" . $_POST['st_username'] . ") / sending them to " . $amazon_url . "!");
 		header("Location: $amazon_url");
 
 	// Handle unknown errors

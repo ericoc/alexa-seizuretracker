@@ -1,0 +1,4 @@
+SEIZURE_ACTIONS	add | log | track | record | store | report
+THINGS		event | seizure
+PLURAL_THINGS	seizures | events
+END_WORDS	over | ended | passed | finished | done | stopped | cleared

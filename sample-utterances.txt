@@ -1,0 +1,41 @@
+CountSeizures count {Things}
+CountSeizures count {Things} today
+CountSeizures count my {Things}
+CountSeizures count my {Things} today
+CountSeizures count the {Things}
+CountSeizures count the {Things} today
+CountSeizures count {Names} {Things}
+CountSeizures count {Names} {Things} today
+CountSeizures how many {Things}
+CountSeizures how many {Things} today
+CountSeizures how many {Things} have I had
+CountSeizures how many {Things} have I had today
+CountSeizures how many {Things} has {Name} had
+CountSeizures how many {Things} has {Name} had today
+CountSeizures how many {Things} has he had
+CountSeizures how many {Things} has he had today
+CountSeizures how many {Things} has she had
+CountSeizures how many {Things} has she had today
+CountSeizures how many {Things} have I had
+CountSeizures how many {Things} have I had today
+
+UpdateSeizure it {EndWord}
+UpdateSeizure its {EndWord}
+UpdateSeizure it's {EndWord}
+UpdateSeizure it is {EndWord}
+UpdateSeizure it has {EndWord}
+UpdateSeizure the {Thing} {EndWord}
+UpdateSeizure the {Thing} is {EndWord}
+UpdateSeizure the {Thing} has {EndWord}
+UpdateSeizure the {Things} {EndWord}
+UpdateSeizure {Names} {Thing} {EndWord}
+UpdateSeizure {Names} {Thing} is {EndWord}
+UpdateSeizure {Names} {Thing} has {EndWord}
+UpdateSeizure {Names} {Things} {EndWord}
+
+LogSeizure {Name} is having a {Thing}
+LogSeizure {Names} having a {Thing}
+LogSeizure {Action} {Names} {Thing}
+LogSeizure {Action} a {Thing}
+LogSeizure I'm having a {Thing}
+LogSeizure I am having a {Thing}

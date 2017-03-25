@@ -1,0 +1,67 @@
+{
+  "intents": [
+    {
+      "intent": "LogSeizure",
+      "slots": [
+        {
+          "name": "Action",
+          "type": "SEIZURE_ACTIONS"
+        },
+        {
+          "name": "Thing",
+          "type": "THINGS"
+        },
+        {
+          "name": "Name",
+          "type": "AMAZON.US_FIRST_NAME"
+        },
+        {
+          "name": "Names",
+          "type": "AMAZON.US_FIRST_NAME's"
+        }
+      ]
+    },
+    {
+      "intent": "UpdateSeizure",
+      "slots": [
+        {
+          "name": "Thing",
+          "type": "THINGS"
+        },
+        {
+          "name": "Things",
+          "type": "PLURAL_THINGS"
+        },
+        {
+          "name": "EndWord",
+          "type": "END_WORDS"
+        },
+        {
+          "name": "Name",
+          "type": "AMAZON.US_FIRST_NAME"
+        },
+        {
+          "name": "Names",
+          "type": "AMAZON.US_FIRST_NAME's"
+        }
+      ]
+    },
+    {
+      "intent": "CountSeizures",
+      "slots": [
+        {
+          "name": "Things",
+          "type": "PLURAL_THINGS"
+        },
+        {
+          "name": "Name",
+          "type": "AMAZON.US_FIRST_NAME"
+        },
+        {
+          "name": "Names",
+          "type": "AMAZON.US_FIRST_NAME's"
+        }
+      ]
+    }
+  ]
+}

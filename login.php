@@ -48,8 +48,6 @@ if ( (isset($_POST['st_username'])) && (isset($_POST['st_password'])) && (!empty
 	// Try to authenticate the user with SeizureTracker.com
 	$auth_user = auth_user($_POST['st_username'], $_POST['st_password']);
 
-	error_log(print_r($auth_user,true));
-
 	// Handle invalid credentials
 	if ($auth_user === false) {
 		echo 'Unfortunately, an invalid user name or password was given. Please go back and try again.';
@@ -57,7 +55,6 @@ if ( (isset($_POST['st_username'])) && (isset($_POST['st_password'])) && (!empty
 	// Handle successful authentication by redirecting the user back to Amazon/Alexa
 	} elseif ( (isset($auth_user)) && (is_string($auth_user)) ) {
 		$amazon_url = htmlspecialchars($_GET['redirect_uri']) . '#state=' . htmlspecialchars($_GET['state']) . '&access_token=' . $auth_user . '&token_type=Bearer';
-		error_log('Successful auth by ' . $_POST['st_username'] . ' ( ' . $auth_user . ')  / sending them to: ' . $amazon_url . ' !');
 		header("Location: $amazon_url");
 
 	// Handle unknown errors

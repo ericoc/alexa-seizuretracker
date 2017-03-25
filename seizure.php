@@ -10,19 +10,16 @@ $input = json_decode(file_get_contents("php://input"));
 // Continue with finding the user and handling intent assuming we have somewhat valid input
 if ( (isset($input->session->user->userId)) && (!empty($input->session->user->userId)) && (isset($input->request->intent)) && (isset($input->request->intent->name)) ) {
 
+	error_log(print_r($input->session->user->accessToken, true));
 	error_log(print_r($input->request->intent, true));
 
-	// Set MySQL database credentials and connect to MySQL
-	$db_hostname = 'localhost';
-	$db_username = $db_database = 'seizuretest';
-	require_once('.seizure.dbpassword.php');
-	$db_link = new PDO("mysql:host=$db_hostname;dbname=$db_database", $db_username, $db_password);
+	// Get user "accessToken" from Alexa
+	if ( (isset($input->session->user->accessToken)) && (is_string($input->session->user->accessToken)) ) {
+		$user_token = get_user($input->session->user->accessToken);
+	}
 
-	// Get user ID using Alexa ID
-	$user_id = get_user($input->session->user->userId, $db_link);
-
-	// Continue if user ID was found
-	if (is_numeric($user_id)) {
+	// Continue if the user token is valid
+	if (check_user($user_token) === true) {
 
 		// Handle the event based on the intent sent from Alexa
 		$handle_seizure = handle_seizure($db_link, $user_id, $input->request->intent);

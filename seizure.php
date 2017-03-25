@@ -29,9 +29,10 @@ if ( (isset($input->session->user->userId)) && (!empty($input->session->user->us
 			$message = 'Sorry. There was an unknown error.';
 		}
 
-	// Otherwise, there was an error finding or adding the user
+	// Otherwise, there was an error finding the users token and they probably need to link their account
 	} else {
-		$message = "Sorry. There was an error with your user account.";
+		linkMessage('Sorry, but please go to the Alexa website or app to link your SeizureTracker account.');
+		exit;
 	}
 
 // Otherwise, invalid input gets a default set of instructions for using this Alexa Skill

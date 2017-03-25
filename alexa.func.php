@@ -31,3 +31,18 @@ function BriefingOut ($uid, $update_date, $title_text, $main_text, $redirect_url
 	$out = json_encode($final, JSON_PRETTY_PRINT);
 	return $out;
 }
+
+// Create a function to give users instructions who have not linked their SeizureTracker.com account yet
+function linkMessage ($speech) {
+
+	// Create the outputSpeech array (This is what Alexa says in response)
+	$output_speech = array('type' => 'PlainText', 'text' => $speech);
+
+	// Create the card array (This is shown at alexa.amazon.com and within the app)
+	$card = array('type' => 'LinkAccount');
+
+	// Create final arrays
+	$response = array('outputSpeech' => $output_speech, 'card' => $card, 'reprompt' => $reprompt_speech);
+	$final = array('version' => '0.1', 'sessionAttributes' => array(), 'response' => $response);
+
+}

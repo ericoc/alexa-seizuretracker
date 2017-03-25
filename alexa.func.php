@@ -42,7 +42,7 @@ function linkMessage ($speech) {
 	$card = array('type' => 'LinkAccount');
 
 	// Create final arrays
-	$response = array('outputSpeech' => $output_speech, 'card' => $card, 'reprompt' => $reprompt_speech);
+	$response = array('outputSpeech' => $output_speech, 'card' => $card,);
 	$final = array('version' => '0.1', 'sessionAttributes' => array(), 'response' => $response);
 
 }

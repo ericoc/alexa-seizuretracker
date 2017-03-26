@@ -4,8 +4,82 @@
 // Create a function to add a seizure
 //
 function add_seizure ($api, $user, $intent) {
-	// TODO: Hit ST API and add a seizure
-	// return: true = success false = failed, null = unknown error
+
+	// Set the URL for the SeizureTracker events api
+	$api->events_url = $api->base_url . '/Events/Events.php/JSON/' . $api->access_code . '/' . $user;
+
+	// HTTP request headers for hitting the SeizureTracker API
+	$headers = array('Content-type: application/json', 'Content-Length: ' . strlen($seizure_json));
+	error_log(print_r($headers,true));
+
+	// Use current timestamp and build the seizure object as JSON
+	$timestamp = date('Y-m-d H:i:s');
+	$api->seizure->Date_Time = $timestamp;
+	$api->seizure->DateTimeEntered = $timestamp;
+	$api->seizure->LastUpdated = $timestamp;
+	$build_seizure = (object) array('Seizures' => array($api->seizure));
+	$seizure_json = json_encode($build_seizure, JSON_PRETTY_PRINT);
+	error_log(print_r($seizure_json,true));
+
+	// Hit the SeizureTracker API to add the seizure
+	$c = curl_init();
+	curl_setopt($c, CURLOPT_URL, $api->events_url);
+	curl_setopt($c, CURLOPT_HTTPHEADER, $headers);
+	curl_setopt($c, CURLOPT_CUSTOMREQUEST, 'PUT');
+	curl_setopt($c, CURLOPT_POSTFIELDS, $seizure_json);
+	curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($c, CURLOPT_USERAGENT, $api->user_agent);
+	curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 2);
+	curl_setopt($c, CURLOPT_TIMEOUT, 2);
+	curl_setopt($c, CURLOPT_USERPWD, $api->user_name . ':' . $api->pass_code);
+	$r = curl_exec($c);
+	$code = curl_getinfo($c, CURLINFO_HTTP_CODE);
+	curl_close($c);
+
+	error_log(print_r($r,true));
+
+	// Proceed in checking that a seizure with the timestamp above actually exists meaning that it was added successfully
+	if (isset($r)) {
+
+		// Hit the SeizureTracker API again to retrieve seizures
+		// This gives more than we want, but we will check the timestamp later
+		$c = curl_init();
+		curl_setopt($c, CURLOPT_URL, $api->events_url);
+		curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($c, CURLOPT_USERAGENT, $api->user_agent);
+		curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 2);
+		curl_setopt($c, CURLOPT_TIMEOUT, 2);
+		curl_setopt($c, CURLOPT_USERPWD, $api->user_name . ':' . $api->pass_code);
+		$r = curl_exec($c);
+		$code = curl_getinfo($c, CURLINFO_HTTP_CODE);
+		curl_close($c);
+
+		// Proceed if the API responded with a 200 or 201
+		if ( ($code === 200) || ($code === 201) ) {
+
+			// Do not bother if the API did not give any seizures back
+			if ($r !== 'No events were found in time period.') {
+
+				// Proceed only if the seizures JSON object actually contains items
+				$seizures = json_decode($r);
+				$seizures = $seizures->Seizures;
+				if ( (isset($seizures)) && (!empty($seizures)) ) {
+
+					// Loop through every seizure returned by the API
+					foreach ($seizures as $seizure) {
+
+						// If we find a seizure with the timestamp of the one we added, adding a seizure was successful
+						if ($seizure->Date_Time === $timestamp) {
+							return true;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// Something weird happened if we haven't returned true by this point
+	return null;
 }
 
 //

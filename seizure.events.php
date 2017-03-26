@@ -28,15 +28,17 @@ function update_seizure ($api, $user) {
 function count_seizures ($api, $user) {
 
 	// Set the URL for the SeizureTracker events api
-	$api->eventsurl = $api->baseurl . '/Events/Events.php/JSON/' . $api->accesscode . '/' . $user;
+	$api->events_url = $api->base_url . '/Events/Events.php/JSON/' . $api->access_code . '/' . $user;
 
+	// Hit the SeizureTracker API to retrieve seizures
+	// This gives more than the current day, but we check their dates later
 	$c = curl_init();
-	curl_setopt($c, CURLOPT_URL, $api->eventsurl);
+	curl_setopt($c, CURLOPT_URL, $api->events_url);
 	curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
-	curl_setopt($c, CURLOPT_USERAGENT, 'Alexa Authentication Development 1.0 / https://github.com/ericoc/alexa-seizuretracker');
+	curl_setopt($c, CURLOPT_USERAGENT, $api->user_agent);
 	curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 2);
 	curl_setopt($c, CURLOPT_TIMEOUT, 2);
-	curl_setopt($c, CURLOPT_USERPWD, $api->username . ':' . $api->passcode);
+	curl_setopt($c, CURLOPT_USERPWD, $api->user_name . ':' . $api->pass_code);
 	$r = curl_exec($c);
 	$code = curl_getinfo($c, CURLINFO_HTTP_CODE);
 	curl_close($c);
@@ -44,37 +46,39 @@ function count_seizures ($api, $user) {
 	// Seizure count starts at zero
 	$seizure_count = (int) 0;
 
-	// No seizures found
-	if ($r === 'No events were found in time period.') {
-		return $seizure_count;
-
 	// Proceed if the API responded with a 200 or 201
-	} elseif ( ($code === 200) || ($code === 201) ) {
+	if ( ($code === 200) || ($code === 201) ) {
 
-		// Proceed if seizures were found
-		$seizures = json_decode($r);
-		$seizures = $seizures->Seizures;
-		if ( (isset($seizures)) && (!empty($seizures)) ) {
+		// Do not bother if the API did not give any seizures back
+		if ($r !== 'No events were found in time period.') {
 
-			// Loop through every seizure returned by the API only counting the ones that occurred today
-			$current_day = date('Y-m-d');
-			foreach ($seizures as $seizure) {
-				if (strtok($seizure->Date_Time, ' ') === $current_day) {
-					$seizure_count++;
+			// Proceed only if the seizures JSON object actually contains items
+			$seizures = json_decode($r);
+			$seizures = $seizures->Seizures;
+			if ( (isset($seizures)) && (!empty($seizures)) ) {
+
+				// Loop through every seizure returned by the API, but only count the ones that occurred today
+				$current_day = date('Y-m-d');
+				foreach ($seizures as $seizure) {
+					if (strtok($seizure->Date_Time, ' ') === $current_day) {
+						$seizure_count++;
+					}
 				}
 			}
 		}
 
-		return $seizure_count;
-
-	// Last resort is that there was some kind of problem reaching the API?
+	// If the API did not give a 200 or 201, something weird happened
 	} else {
 		return null;
 	}
+
+	// Return seizure_count
+	return (int) $seizure_count;
+
 }
 
 //
-// Create a function to handle a seizure sent from Alexa
+// Create a function to handle a seizure request sent from Alexa
 //
 function handle_seizure ($user, $intent) {
 

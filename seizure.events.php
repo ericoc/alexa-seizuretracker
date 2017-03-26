@@ -31,7 +31,7 @@ function count_seizures ($api, $user) {
 	$api->eventsurl = $api->baseurl . '/Events/Events.php/JSON/' . $api->accesscode . '/' . $user;
 
 	$c = curl_init();
-	curl_setopt($c, CURLOPT_URL, $api->tokenurl);
+	curl_setopt($c, CURLOPT_URL, $api->eventsurl);
 	curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
 	curl_setopt($c, CURLOPT_USERAGENT, 'Alexa Authentication Development 1.0 / https://github.com/ericoc/alexa-seizuretracker');
 	curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 2);

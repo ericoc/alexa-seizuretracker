@@ -8,10 +8,6 @@ function add_seizure ($api, $user, $intent) {
 	// Set the URL for the SeizureTracker events api
 	$api->events_url = $api->base_url . '/Events/Events.php/JSON/' . $api->access_code . '/' . $user;
 
-	// HTTP request headers for hitting the SeizureTracker API
-	$headers = array('Content-type: application/json', 'Content-Length: ' . strlen($seizure_json));
-	error_log(print_r($headers,true));
-
 	// Use current timestamp and build the seizure object as JSON
 	$timestamp = date('Y-m-d H:i:s');
 	$api->seizure->Date_Time = $timestamp;
@@ -20,6 +16,10 @@ function add_seizure ($api, $user, $intent) {
 	$build_seizure = (object) array('Seizures' => array($api->seizure));
 	$seizure_json = json_encode($build_seizure, JSON_PRETTY_PRINT);
 	error_log(print_r($seizure_json,true));
+
+	// HTTP request headers for hitting the SeizureTracker API
+	$headers = array('Content-type: application/json', 'Content-Length: ' . strlen($seizure_json));
+	error_log(print_r($headers,true));
 
 	// Hit the SeizureTracker API to add the seizure
 	$c = curl_init();

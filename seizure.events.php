@@ -36,18 +36,18 @@ function count_seizures ($api, $user) {
 	curl_setopt($c, CURLOPT_USERAGENT, 'Alexa Authentication Development 1.0 / https://github.com/ericoc/alexa-seizuretracker');
 	curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 2);
 	curl_setopt($c, CURLOPT_TIMEOUT, 2);
-	curl_setopt($c, CURLOPT_USERPWD, $api->username . ':' . $api->password);
+	curl_setopt($c, CURLOPT_USERPWD, $api->username . ':' . $api->passcode);
 	$r = json_decode(curl_exec($c));
 	$code = curl_getinfo($c, CURLINFO_HTTP_CODE);
 	curl_close($c);
-
-	error_log(print_r($r,true));
 
 	// Proceed if the API responded with a 200 or 201
 	if ( ($code === 200) || ($code === 201) ) {
 
 		// Proceed if seizures were found
 		if ( (isset($r->Seizures)) && (!empty($r->Seizures)) ) {
+
+			error_log(print_r($r,true));
 
 		// No seizures found
 		} else {

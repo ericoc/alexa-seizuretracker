@@ -3,7 +3,7 @@
 //
 // Create a function to add a seizure
 //
-function add_seizure($api, $user_id, $intent) {
+function add_seizure ($api, $user, $intent) {
 	// TODO: Hit ST API and add a seizure
 	// return: true = success false = failed, null = unknown error
 }
@@ -11,7 +11,7 @@ function add_seizure($api, $user_id, $intent) {
 //
 // Create a function to update a seizure (marking it with an end date)
 //
-function update_seizure($api, $user_id) {
+function update_seizure ($api, $user) {
 
 /*
 	TODO: Hit ST API, find most recent seizure, and either:
@@ -25,9 +25,43 @@ function update_seizure($api, $user_id) {
 //
 // Create a function to count the number of seizures for a user today
 //
-function count_seizures($api, $user_id) {
+function count_seizures ($api, $user) {
 
-	// TODO: Hit ST API and count seizures today!
+	// Set the URL for the SeizureTracker events api
+	$api->eventsurl = $api->baseurl . '/Events/Events.php/JSON/' . $api->accesscode . '/' . $user;
+
+	$c = curl_init();
+	curl_setopt($c, CURLOPT_URL, $st_api->tokenurl);
+	curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($c, CURLOPT_USERAGENT, 'Alexa Authentication Development 1.0 / https://github.com/ericoc/alexa-seizuretracker');
+	curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 2);
+	curl_setopt($c, CURLOPT_TIMEOUT, 2);
+	curl_setopt($c, CURLOPT_USERPWD, $api->st_username . ':' . $api->st_password);
+	$r = json_decode(curl_exec($c));
+	$code = curl_getinfo($c, CURLINFO_HTTP_CODE);
+	curl_close($c);
+
+	error_log(print_r($r,true));
+
+	// Proceed if the API responded with a 200 or 201
+	if ( ($code === 200) || ($code === 201) ) {
+
+		// Proceed if seizures were found
+		if ( (isset($r->Seizures)) && (!empty($r->Seizures)) ) {
+
+		// No seizures found
+		} else {
+			$seizure_count = (int) 0;
+		}
+
+	// A 401 HTTP response means invalid user token
+	} elseif ($code === 401) {
+		return false;
+
+	// Last resort is that there was some kind of problem reaching the API?
+	} else {
+		return null;
+	}
 
 	// Return the number of seizures found
 	if (is_int($seizure_count)) {
@@ -42,13 +76,16 @@ function count_seizures($api, $user_id) {
 //
 // Create a function to handle a seizure sent from Alexa
 //
-function handle_seizure ($api, $user_id, $intent) {
+function handle_seizure ($user, $intent) {
+
+	// Include the SeizureTracker API settings/credentials
+	require_once('.st.api.php');
 
 	// Add a new seizure, if requested
 	if ($intent->name == 'LogSeizure') {
 
 		// Try to add the seizure
-		$add_seizure = add_seizure($api, $user_id, $intent);
+		$add_seizure = add_seizure($st_api, $user, $intent);
 
 		// If we got an ID back, it is numeric so adding the seizure was successful and we pass that along
 		if (is_numeric($add_seizure)) {
@@ -63,7 +100,7 @@ function handle_seizure ($api, $user_id, $intent) {
 	} elseif ($intent->name == 'UpdateSeizure') {
 
 		// Try to update the seizure
-		$update_seizure = update_seizure($api, $user_id, $intent);
+		$update_seizure = update_seizure($st_api, $user, $intent);
 
 		// All set; seizure was updated and marked as over
 		if ($update_seizure === true) {
@@ -82,7 +119,7 @@ function handle_seizure ($api, $user_id, $intent) {
 	} elseif ($intent->name == 'CountSeizures') {
 
 		// Get the count of the current users seizures today
-		$count_seizures = count_seizures($api, $user_id);
+		$count_seizures = count_seizures($st_api, $user);
 
 		// All set; return how many seizures were tracked today, using the users own words
 		if ($count_seizures > 0) {

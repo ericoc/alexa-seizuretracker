@@ -53,19 +53,19 @@ function count_seizures ($api, $user) {
 
 		// Proceed if seizures were found
 		$seizures = json_decode($r);
-		error_log(print_r($seizures,true));
+		$seizures = $seizures->Seizures;
 		if ( (isset($seizures)) && (!empty($seizures)) ) {
 
 			// Loop through every seizure returned by the API only counting the ones that occurred today
 			$current_day = date('Y-m-d');
-			foreach ($seizures->Seizures as $seizure) {
-				error_log(print_r($seizure,true));
+			foreach ($seizures as $seizure) {
 				if (strtok($seizure->Date_Time, ' ') === $current_day) {
-					error_log('counting this...');
 					$seizure_count++;
 				}
 			}
 		}
+
+		return $seizure_count;
 
 	// Last resort is that there was some kind of problem reaching the API?
 	} else {

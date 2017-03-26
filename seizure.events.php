@@ -58,7 +58,7 @@ function count_seizures ($api, $user) {
 
 			// Loop through every seizure returned by the API only counting the ones that occurred today
 			$current_day = date('Y-m-d');
-			foreach ($seizures as $seizure) {
+			foreach ($seizures->Seizures as $seizure) {
 				error_log(print_r($seizure,true));
 				if (strtok($seizure->Date_Time, ' ') === $current_day) {
 					error_log('counting this...');

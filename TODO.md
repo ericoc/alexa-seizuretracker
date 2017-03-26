@@ -2,8 +2,12 @@
 
 #### goal #1
 
-* actually hook in to the [seizuretracker.com](https://seizuretracker.com/) API!
-  - once this is reality, it can actually get sent off to Amazon for certification and hopefully 🤞 get published as an Alexa Skill for any one to use maybe?
+* ~~actually hook in to the [seizuretracker.com](https://seizuretracker.com/) API!~~
+  - this is real!! got Account Linkage working as well as counting seizures, but...
+     * need to be able add seizures
+     * need to be able to update end date of most recent seizure
+ 
+- actually get it sent off to Amazon for certification and hopefully 🤞 get published as an Alexa Skill for any one to use maybe?!
 
 ---
 

@@ -1,6 +1,5 @@
 <?php
 
-require_once('.st.api.php');
 require_once('alexa.func.php');
 require_once('seizure.events.php');
 
@@ -17,7 +16,7 @@ if ( (isset($input->session->user->userId)) && (!empty($input->session->user->us
 	if ( (isset($input->session->user->accessToken)) && (is_string($input->session->user->accessToken)) ) {
 
 		// Handle the event based on the intent sent from Alexa
-		$handle_seizure = handle_seizure($st_api, $input->session->user->accessToken, $input->request->intent);
+		$handle_seizure = handle_seizure($input->session->user->accessToken, $input->request->intent);
 
 		// Set the message awkwardly
 		// (TODO: find a better way of doing this)

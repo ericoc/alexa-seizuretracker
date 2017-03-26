@@ -52,16 +52,16 @@ function count_seizures ($api, $user) {
 	} elseif ( ($code === 200) || ($code === 201) ) {
 
 		// Proceed if seizures were found
-		$r = json_decode($r);
-		if ( (isset($r->Seizures)) && (!empty($r->Seizures)) ) {
-
-			// Seizure count starts at zero and today is today
-			$seizure_count = 0;
-			$current_day = date('Y-m-d');
+		$seizures = json_decode($r);
+		error_log(print_r($seizures,true));
+		if ( (isset($seizures)) && (!empty($seizures)) ) {
 
 			// Loop through every seizure returned by the API only counting the ones that occurred today
-			foreach ($r->Seizures as $seizure) {
-				if (strtok($seizure->DateTimeEntered, ' ') === $current_day) {
+			$current_day = date('Y-m-d');
+			foreach ($seizures as $seizure) {
+				error_log(print_r($seizure,true));
+				if (strtok($seizure->Date_Time, ' ') === $current_day) {
+					error_log('counting this...');
 					$seizure_count++;
 				}
 			}

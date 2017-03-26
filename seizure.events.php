@@ -15,11 +15,9 @@ function add_seizure ($api, $user, $intent) {
 	$api->seizure->LastUpdated = $timestamp;
 	$build_seizure = (object) array('Seizures' => array($api->seizure));
 	$seizure_json = json_encode($build_seizure, JSON_PRETTY_PRINT);
-	error_log(print_r($seizure_json,true));
 
 	// HTTP request headers for hitting the SeizureTracker API
 	$headers = array('Content-type: application/json', 'Content-Length: ' . strlen($seizure_json));
-	error_log(print_r($headers,true));
 
 	// Hit the SeizureTracker API to add the seizure
 	$c = curl_init();
@@ -35,8 +33,6 @@ function add_seizure ($api, $user, $intent) {
 	$r = curl_exec($c);
 	$code = curl_getinfo($c, CURLINFO_HTTP_CODE);
 	curl_close($c);
-
-	error_log(print_r($r,true));
 
 	// Proceed in checking that a seizure with the timestamp above actually exists meaning that it was added successfully
 	if (isset($r)) {
@@ -69,7 +65,7 @@ function add_seizure ($api, $user, $intent) {
 					foreach ($seizures as $seizure) {
 
 						// If we find a seizure with the timestamp of the one we added, adding a seizure was successful
-						if ($seizure->Date_Time === $timestamp) {
+						if ($seizure->DateTimeEntered === $timestamp) {
 							return true;
 						}
 					}
@@ -165,12 +161,12 @@ function handle_seizure ($user, $intent) {
 		// Try to add the seizure
 		$add_seizure = add_seizure($st_api, $user, $intent);
 
-		// If we got an ID back, it is numeric so adding the seizure was successful and we pass that along
-		if (is_numeric($add_seizure)) {
+		// If it worked and was verified, adding the seizure was successful
+		if ($add_seizure === true) {
 			$return = 'Okay. The seizure has been tracked.';
 
-		// Something went wrong trying to add the seizure
-		} elseif ($add_seizure === null) {
+		// Otherwise, something went wrong trying to add the seizure
+		} else {
 			$return = 'Sorry. There was an error tracking the seizure.';
 		}
 

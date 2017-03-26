@@ -37,37 +37,37 @@ function count_seizures ($api, $user) {
 	curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 2);
 	curl_setopt($c, CURLOPT_TIMEOUT, 2);
 	curl_setopt($c, CURLOPT_USERPWD, $api->username . ':' . $api->passcode);
-	$r = json_decode(curl_exec($c));
+	$r = curl_exec($c);
 	$code = curl_getinfo($c, CURLINFO_HTTP_CODE);
 	curl_close($c);
 
-	// Proceed if the API responded with a 200 or 201
-	if ( ($code === 200) || ($code === 201) ) {
+	// Seizure count starts at zero
+	$seizure_count = (int) 0;
 
-		// Proceed if seizures were found
-		if ( (isset($r->Seizures)) && (!empty($r->Seizures)) ) {
-
-			error_log(print_r($r,true));
-
-		// No seizures found
-		} else {
-			$seizure_count = (int) 0;
-		}
-
-	// A 401 HTTP response means invalid user token
-	} elseif ($code === 401) {
-		return false;
-
-	// Last resort is that there was some kind of problem reaching the API?
-	} else {
-		return null;
-	}
-
-	// Return the number of seizures found
-	if (is_int($seizure_count)) {
+	// No seizures found
+	if ($r === 'No events were found in time period.') {
 		return $seizure_count;
 
-	// Otherwise, something went wrong trying to count seizures
+	// Proceed if the API responded with a 200 or 201
+	} elseif ( ($code === 200) || ($code === 201) ) {
+
+		// Proceed if seizures were found
+		$r = json_decode($r);
+		if ( (isset($r->Seizures)) && (!empty($r->Seizures)) ) {
+
+			// Seizure count starts at zero and today is today
+			$seizure_count = 0;
+			$current_day = date('Y-m-d');
+
+			// Loop through every seizure returned by the API only counting the ones that occurred today
+			foreach ($r->Seizures as $seizure) {
+				if (strtok($seizure->DateTimeEntered, ' ') === $current_day) {
+					$seizure_count++;
+				}
+			}
+		}
+
+	// Last resort is that there was some kind of problem reaching the API?
 	} else {
 		return null;
 	}

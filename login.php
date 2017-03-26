@@ -42,7 +42,7 @@ function auth_user ($username, $password) {
 	}
 }
 
-// Proceed in handling the below form if it was submitted
+// Proceed in handling the below log-in form if it was submitted
 if ( (isset($_POST['st_username'])) && (isset($_POST['st_password'])) && (!empty($_POST['st_username'])) && (!empty($_POST['st_password'])) ) {
 
 	// Try to authenticate the user with SeizureTracker.com

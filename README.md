@@ -40,7 +40,7 @@ The things defined here determine what is in the (JSON within the) HTTPS request
 
 "Intent Schema" is a JSON outline of what custom slot types can be used with what intents and how they will be identified in the sample utterances.
 
-  * Simply paste the JSON contents of the [seizure-intents.json file from this repository](seizure-intents.json) in to the text area.
+  * Simply paste the JSON contents of the [intent-schema.json file from this repository](intent-schema.json) in to the text area.
 
 #### Custom Slot Types
 

@@ -1,7 +1,6 @@
 {
   "intents": [
     {
-      "intent": "LogSeizure",
       "slots": [
         {
           "name": "Action",
@@ -19,10 +18,10 @@
           "name": "Names",
           "type": "AMAZON.US_FIRST_NAME's"
         }
-      ]
+      ],
+      "intent": "LogSeizure"
     },
     {
-      "intent": "UpdateSeizure",
       "slots": [
         {
           "name": "Thing",
@@ -44,10 +43,10 @@
           "name": "Names",
           "type": "AMAZON.US_FIRST_NAME's"
         }
-      ]
+      ],
+      "intent": "UpdateSeizure"
     },
     {
-      "intent": "CountSeizures",
       "slots": [
         {
           "name": "Things",
@@ -61,7 +60,8 @@
           "name": "Names",
           "type": "AMAZON.US_FIRST_NAME's"
         }
-      ]
+      ],
+      "intent": "CountSeizures"
     }
   ]
 }

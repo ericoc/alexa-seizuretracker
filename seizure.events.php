@@ -155,8 +155,12 @@ function handle_seizure ($user, $intent) {
 	// Include the SeizureTracker API settings/credentials
 	require_once('.st.api.php');
 
+	// Tell the user how to track a seizure if they provided no intent
+	if ($intent->name == 'AMAZON.HelpIntent') {
+		$return = 'Please say, "Tell SeizureTracker to track a seizure", if you would like to track a seizure.';
+
 	// Count users current number of seizures today, if requested
-	if ($intent->name == 'CountSeizures') {
+	} elseif ($intent->name == 'CountSeizures') {
 
 		// Get the count of the current users seizures today
 		$count_seizures = count_seizures($st_api, $user);
@@ -175,7 +179,7 @@ function handle_seizure ($user, $intent) {
 		}
 
 	// Add a new seizure, if requested
-	} elseif ($intent->name == 'LogSeizure') {
+	} elseif ($intent->name == 'AddSeizure') {
 
 		// Try to add the seizure
 		$add_seizure = add_seizure($st_api, $user, $intent);

@@ -5,7 +5,7 @@ The following documentation should explain how to set up this custom Alexa skill
 The goal here is to use the SeizureTracker.com API and allow any one to do the following things with Alexa voice commands to an Amazon Echo (or Echo Dot!):
 
   * Count seizures that have occurred today (`CountSeizures`)
-  * Track a seizure (`LogSeizure`)
+  * Track a seizure (`AddSeizure`)
   * Mark seizure as being over (`EndSeizure`)
 
 ---

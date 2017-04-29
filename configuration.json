@@ -94,7 +94,7 @@
       ]
     },
     {
-      "name": "LogSeizure",
+      "name": "AddSeizure",
       "samples": [
         "{Name} is having a {SeizureWord}",
         "{Name} having a {SeizureWord}",
@@ -257,7 +257,7 @@
       ]
     },
     {
-      "id": "Elicit.Intent-LogSeizure.IntentSlot-SeizureWord",
+      "id": "Elicit.Intent-AddSeizure.IntentSlot-SeizureWord",
       "promptVersion": "1.0",
       "definitionVersion": "1.0",
       "variations": [
@@ -337,7 +337,7 @@
         ]
       },
       {
-        "name": "LogSeizure",
+        "name": "AddSeizure",
         "confirmationRequired": false,
         "prompts": {},
         "slots": [
@@ -354,7 +354,7 @@
             "elicitationRequired": true,
             "confirmationRequired": false,
             "prompts": {
-              "elicit": "Elicit.Intent-LogSeizure.IntentSlot-SeizureWord"
+              "elicit": "Elicit.Intent-AddSeizure.IntentSlot-SeizureWord"
             }
           },
           {

@@ -6,7 +6,7 @@ require_once('seizure.events.php');
 // Get the input from Alexa and JSON-decode it
 $input = json_decode(file_get_contents("php://input"));
 
-// Continue with finding the user and handling intent assuming we have somewhat valid input
+// Continue with finding the user and handling intent assuming we have valid input
 if ( (isset($input->session->user->userId)) && (!empty($input->session->user->userId)) && (isset($input->request->intent)) && (isset($input->request->intent->name)) ) {
 
 	error_log(print_r($input->session->user->accessToken, true));
@@ -41,5 +41,5 @@ if ( (isset($input->session->user->userId)) && (!empty($input->session->user->us
 
 // The output is always JSON, return it!
 header('Content-Type: application/json;charset=UTF-8');
-$out = AlexaOut($message, 'SeizureTest', $message);
+$out = AlexaOut($message, 'SeizureTracker', $message);
 echo "$out\n";

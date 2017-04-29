@@ -5,7 +5,7 @@
 //
 function add_seizure ($api, $user, $intent) {
 
-	// Set the URL for the SeizureTracker events api
+	// Set the URL for the SeizureTracker events API
 	$api->events_url = $api->base_url . '/Events/Events.php/JSON/' . $api->access_code . '/' . $user;
 
 	// Use current timestamp and build the seizure object as JSON
@@ -36,6 +36,10 @@ function add_seizure ($api, $user, $intent) {
 
 	// Proceed in checking that a seizure with the timestamp above actually exists meaning that it was added successfully
 	if (isset($r)) {
+
+		// Append the URL parameters to request only the seizures for today from the API
+		$current_day = date('Y-m-d');
+		$api->events_url .= '/?Length=DateRange&Date=' . $current_day . '&StartDate=' . $current_day;
 
 		// Hit the SeizureTracker API again to retrieve seizures
 		// This gives more than we want, but we will check the timestamp later
@@ -83,8 +87,14 @@ function add_seizure ($api, $user, $intent) {
 //
 function count_seizures ($api, $user) {
 
-	// Set the URL for the SeizureTracker events api
+	// Set the URL for the SeizureTracker events API
 	$api->events_url = $api->base_url . '/Events/Events.php/JSON/' . $api->access_code . '/' . $user;
+
+	// Append the URL parameters to request only the seizures for today from the API
+	$current_day = date('Y-m-d');
+	$api->events_url .= '/?Length=DateRange&Date=' . $current_day . '&StartDate=' . $current_day;
+
+	error_log($api->events_url);
 
 	// Hit the SeizureTracker API to retrieve seizures
 	// This gives more than the current day, but we check their dates later
@@ -112,14 +122,7 @@ function count_seizures ($api, $user) {
 			$seizures = json_decode($r);
 			$seizures = $seizures->Seizures;
 			if ( (isset($seizures)) && (!empty($seizures)) ) {
-
-				// Loop through every seizure returned by the API, but only count the ones that occurred today
-				$current_day = date('Y-m-d');
-				foreach ($seizures as $seizure) {
-					if (strtok($seizure->Date_Time, ' ') === $current_day) {
-						$seizure_count++;
-					}
-				}
+				$seizure_count = count($seizures);
 			}
 		}
 

@@ -167,7 +167,15 @@ function handle_seizure ($user, $intent) {
 
 		// All set; return how many seizures were tracked today, using the users own words
 		if ($count_seizures > 0) {
-			$return = 'So far today, I have tracked ' . $count_seizures . ' ' . $intent->slots->SeizureWords->value;
+
+			// Try to respond using the users own phrase for the count, but if not possible, go with "seizures"
+			if (isset($intent->slots->SeizureWords->value)) {
+				$counted_word = $intent->slots->SeizureWords->value;
+			} else {
+				$counted_word = 'seizures';
+			}
+
+			$return = "So far today, $count_seizures $counted_word have been tracked.";
 
 		// No seizures were found for today
 		} elseif ($count_seizures === 0) {

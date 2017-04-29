@@ -4,7 +4,7 @@
 function auth_user ($username, $password) {
 
 	// Include the SeizureTracker API settings
-	require_once('.st.api.php');
+	require_once('st.api.php');
 
 	// Set the SeizureTracker API URL to hit
 	$st_api->token_url = $st_api->base_url . '/STUser/GetToken.php/JSON/' . $st_api->access_code . '/' . $st_api->project_id;

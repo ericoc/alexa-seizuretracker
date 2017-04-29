@@ -156,7 +156,7 @@ function end_seizure ($api, $user) {
 function handle_seizure ($user, $intent) {
 
 	// Include the SeizureTracker API settings/credentials
-	require_once('.st.api.php');
+	require_once('st.api.php');
 
 	// Tell the user how to track a seizure if they provided no intent
 	if ($intent->name == 'AMAZON.HelpIntent') {

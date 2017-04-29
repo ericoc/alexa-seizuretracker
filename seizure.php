@@ -9,15 +9,15 @@ $input = json_decode(file_get_contents("php://input"));
 // Proceed if it is a somewhat valid request
 if ( (isset($input->session->user->userId)) && (!empty($input->session->user->userId)) && (isset($input->request->intent)) && (isset($input->request->intent->name)) ) {
 
+	// Logging for debugging
+	error_log(print_r($input->session->user->accessToken, true));
+	error_log(print_r($input->request->intent, true));
+
 	// Tell the user to link their SeizureTracker account if no accessToken was found or their accessToken is not a string
 	if ( (!isset($input->session->user->accessToken)) || (empty($input->session->user->accessToken)) || (!is_string($input->session->user->accessToken)) ) {
 		$out = alexa_link_out('Sorry, but please go to the Alexa website or app to link your SeizureTracker account.');
 
 	} else {
-
-		// Logging for debugging
-		error_log(print_r($input->session->user->accessToken, true));
-		error_log(print_r($input->request->intent, true));
 
 		// Include required functions and handle the event based on the intent sent from Alexa
 		require_once('seizure.events.php');
@@ -41,8 +41,12 @@ if ( (isset($input->session->user->userId)) && (!empty($input->session->user->us
 
 // If $out was not already defined by the account link function, generate it now using $message
 if ( (!isset($out)) && (isset($message)) ) {
+	error_log($message);
 	$out = alexa_out($message, 'SeizureTracker', $message);
+} else {
+	error_log('Account is not linked');
 }
+error_log("\n---\n");
 
 // The output is always JSON, return it either way
 header('Content-Type: application/json;charset=UTF-8');

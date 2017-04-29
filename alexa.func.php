@@ -1,7 +1,7 @@
 <?php
 
 // Define a function to create JSON for Alexa to interpret
-function AlexaOut ($speech, $card_title, $card_phrase, $reprompt_speech = null, $end_session = true, $redirect_url = null) {
+function alexa_out ($speech, $card_title, $card_phrase, $reprompt_speech = null, $end_session = true, $redirect_url = null) {
 
 	// Create the outputSpeech array (This is what Alexa says in response)
 	$output_speech = array('type' => 'PlainText', 'text' => $speech);
@@ -23,16 +23,16 @@ function AlexaOut ($speech, $card_title, $card_phrase, $reprompt_speech = null, 
 }
 
 // Define a function to create JSON for Alexa Flash Briefing skills
-function BriefingOut ($uid, $update_date, $title_text, $main_text, $redirect_url = null) {
+function briefing_out ($uid, $update_date, $title_text, $main_text, $redirect_url = null) {
 
 	// Create the short array to return for Flash Briefing skills, JSON encode it, and return it
 	$final = array('uid' => $uid, 'updateDate' => $update_date, 'titleText' => $title_text, 'mainText' => $main_text, 'redirectUrl' => $redirect_url);
-	$out = json_encode($final, JSON_PRETTY_PRINT);
-	return $out;
+	$output = json_encode($final, JSON_PRETTY_PRINT);
+	return $output;
 }
 
-// Create a function to give users instructions who have not linked their account yet
-function linkMessage ($speech) {
+// Define a function to create JSON for an Alexa card and instructions to users who have not linked their account
+function alexa_link_out ($speech) {
 
 	// Create the outputSpeech array (This is what Alexa says in response)
 	$output_speech = array('type' => 'PlainText', 'text' => $speech);
@@ -43,5 +43,6 @@ function linkMessage ($speech) {
 	// Create final arrays
 	$response = array('outputSpeech' => $output_speech, 'card' => $card,);
 	$final = array('version' => '0.1', 'sessionAttributes' => array(), 'response' => $response);
-
+	$output = json_encode($final, JSON_PRETTY_PRINT);
+	return $output;
 }

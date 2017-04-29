@@ -40,7 +40,7 @@ if ( (isset($input->session->user->userId)) && (!empty($input->session->user->us
 }
 
 // If $out was not already defined by the account link function, generate it now using $message
-if (!isset($out)) {
+if ( (!isset($out)) && (isset($message)) ) {
 	$out = alexa_out($message, 'SeizureTracker', $message);
 }
 

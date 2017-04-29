@@ -79,20 +79,6 @@ function add_seizure ($api, $user, $intent) {
 }
 
 //
-// Create a function to update a seizure (marking it with an end date)
-//
-function update_seizure ($api, $user) {
-
-/*
-	TODO: Hit ST API, find most recent seizure, and either:
-			1. update it with an end date OR
-			2. delete it, but create a new seizure with the old one's start date and an accurate end date
-	return: true = success false = failed, null = unknown error
-*/
-
-}
-
-//
 // Create a function to count the number of seizures for a user today
 //
 function count_seizures ($api, $user) {
@@ -148,6 +134,20 @@ function count_seizures ($api, $user) {
 }
 
 //
+// Create a function to mark a seizure as having ended
+//
+function end_seizure ($api, $user) {
+
+/*
+	TODO: Hit ST API, find most recent seizure, and either:
+			1. update it with an end date OR
+			2. delete it, but create a new seizure with the old one's start date and an accurate end date
+	return: true = success false = failed to find a seizure to mark over, null = unknown error
+*/
+
+}
+
+//
 // Create a function to handle a seizure request sent from Alexa
 //
 function handle_seizure ($user, $intent) {
@@ -155,8 +155,27 @@ function handle_seizure ($user, $intent) {
 	// Include the SeizureTracker API settings/credentials
 	require_once('.st.api.php');
 
+	// Count users current number of seizures today, if requested
+	if ($intent->name == 'CountSeizures') {
+
+		// Get the count of the current users seizures today
+		$count_seizures = count_seizures($st_api, $user);
+
+		// All set; return how many seizures were tracked today, using the users own words
+		if ($count_seizures > 0) {
+			$return = 'So far today, I have tracked ' . $count_seizures . ' ' . $intent->slots->SeizureWords->value;
+
+		// No seizures were found for today
+		} elseif ($count_seizures === 0) {
+			$return = 'No seizures have been tracked today.';
+
+		// Something went wrong trying to determine seizure count
+		} elseif ( ($count_seizures === null) || ($count_seizures < 0) ) {
+			$return = 'Sorry. There was an error trying to count the number of seizures that have been tracked today.';
+		}
+
 	// Add a new seizure, if requested
-	if ($intent->name == 'LogSeizure') {
+	} elseif ($intent->name == 'LogSeizure') {
 
 		// Try to add the seizure
 		$add_seizure = add_seizure($st_api, $user, $intent);
@@ -170,42 +189,23 @@ function handle_seizure ($user, $intent) {
 			$return = 'Sorry. There was an error tracking the seizure.';
 		}
 
-	// Update the end date of a seizure that is over, if requested
-	} elseif ($intent->name == 'UpdateSeizure') {
+	// Mark a seizure as having ended, if requested
+	} elseif ($intent->name == 'EndSeizure') {
 
-		// Try to update the seizure
-		$update_seizure = update_seizure($st_api, $user, $intent);
+		// Try to mark the seizure as having ended
+		$end_seizure = end_seizure($st_api, $user, $intent);
 
 		// All set; seizure was updated and marked as over
-		if ($update_seizure === true) {
+		if ($end_seizure === true) {
 			$return = 'Okay. The seizure has been marked as over.';
 
-		// Something went wrong trying to update the seizure
-		} elseif ($update_seizure === false) {
-			$return = 'Sorry. There was an error while trying to mark the seizure as over.';
-
-		// No seizure was found (in the past five minutes for this user) to mark over
-		} elseif ($update_seizure === null) {
+		// No seizure could be found to mark as over
+		} elseif ($end_seizure === false) {
 			$return = 'Sorry. No seizure could be found to mark as over.';
-		}
 
-	// Count users current number of seizures today, if requested
-	} elseif ($intent->name == 'CountSeizures') {
-
-		// Get the count of the current users seizures today
-		$count_seizures = count_seizures($st_api, $user);
-
-		// All set; return how many seizures were tracked today, using the users own words
-		if ($count_seizures > 0) {
-			$return = 'So far today, I have tracked ' . $count_seizures . ' ' . $intent->slots->Things->value;
-
-		// No seizures were found for today
-		} elseif ($count_seizures === 0) {
-			$return = 'No seizures have been tracked today.';
-
-		// Something went wrong trying to determine seizure count
-		} elseif ( ($count_seizures === null) || ($count_seizures < 0) ) {
-			$return = 'Sorry. There was an error trying to count the number of seizures that have been tracked today.';
+		// No seizure was found to mark over or something weird happened?
+		} elseif ($end_seizure === null) {
+			$return = 'Sorry. There was an error trying to mark a seizure as over.';
 		}
 	}
 

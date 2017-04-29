@@ -1,4 +1,28 @@
-SEIZURE_ACTIONS	add | log | track | record | store | report
-THINGS		event | seizure
-PLURAL_THINGS	seizures | events
-END_WORDS	over | ended | passed | finished | done | stopped | cleared
+COUNT_WORDS
+count
+how many
+
+END_WORDS
+cleared
+stopped
+done
+finished
+passed
+ended
+over
+
+SEIZURE_ACTIONS
+report
+store
+record
+track
+log
+add
+
+SEIZURE_WORDS
+seizure
+event
+
+SEIZURE_WORDS_PLURAL
+seizures
+events

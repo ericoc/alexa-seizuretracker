@@ -1,67 +1,371 @@
 {
   "intents": [
     {
+      "name": "AMAZON.CancelIntent",
+      "samples": []
+    },
+    {
+      "name": "AMAZON.HelpIntent",
+      "samples": []
+    },
+    {
+      "name": "AMAZON.StopIntent",
+      "samples": []
+    },
+    {
+      "name": "CountSeizures",
+      "samples": [
+        "{CountWord} {SeizureWords}",
+        "{CountWord} {SeizureWords} today",
+        "{CountWord} my {SeizureWords}",
+        "{CountWord} my {SeizureWords} today",
+        "{CountWord} the {SeizureWords}",
+        "{CountWord} the {SeizureWords} today",
+        "{CountWord} {Name} {SeizureWords}",
+        "{CountWord} {Name} {SeizureWords} today",
+        "{CountWord} his {SeizureWords} today",
+        "{CountWord} her {SeizureWords} today",
+        "{CountWord} {SeizureWords} have I had",
+        "{CountWord} {SeizureWords} have I had today",
+        "{CountWord} {SeizureWords} have they had today",
+        "{CountWord} {SeizureWords} has {Name} had",
+        "{CountWord} {SeizureWords} has {Name} had today",
+        "{CountWord} {SeizureWords} has he had",
+        "{CountWord} {SeizureWords} has he had today",
+        "{CountWord} {SeizureWords} has she had",
+        "{CountWord} {SeizureWords} has she had today"
+      ],
       "slots": [
         {
-          "name": "Action",
-          "type": "SEIZURE_ACTIONS"
+          "name": "SeizureWords",
+          "type": "SEIZURE_WORDS_PLURAL",
+          "samples": []
         },
         {
-          "name": "Thing",
-          "type": "THINGS"
+          "name": "CountWord",
+          "type": "COUNT_WORDS",
+          "samples": []
         },
         {
           "name": "Name",
-          "type": "AMAZON.US_FIRST_NAME"
-        },
-        {
-          "name": "Names",
-          "type": "AMAZON.US_FIRST_NAME's"
+          "type": "AMAZON.US_FIRST_NAME",
+          "samples": []
         }
-      ],
-      "intent": "LogSeizure"
+      ]
     },
     {
+      "name": "EndSeizure",
+      "samples": [
+        "it {EndWord}",
+        "its {EndWord}",
+        "it's {EndWord}",
+        "it is {EndWord}",
+        "it has {EndWord}",
+        "the {Thing} {EndWord}",
+        "the {Thing} is {EndWord}",
+        "the {Thing} has {EndWord}",
+        "the {SeizureWords} {EndWord}",
+        "{Name} {Thing} {EndWord}",
+        "{Name} {Thing} is {EndWord}",
+        "{Name} {Thing} has {EndWord}",
+        "{Name} {SeizureWords} {EndWord}"
+      ],
       "slots": [
         {
           "name": "Thing",
-          "type": "THINGS"
+          "type": "SEIZURE_WORDS",
+          "samples": []
         },
         {
-          "name": "Things",
-          "type": "PLURAL_THINGS"
+          "name": "SeizureWords",
+          "type": "SEIZURE_WORDS_PLURAL",
+          "samples": []
         },
         {
           "name": "EndWord",
-          "type": "END_WORDS"
+          "type": "END_WORDS",
+          "samples": []
         },
         {
           "name": "Name",
-          "type": "AMAZON.US_FIRST_NAME"
-        },
-        {
-          "name": "Names",
-          "type": "AMAZON.US_FIRST_NAME's"
+          "type": "AMAZON.US_FIRST_NAME",
+          "samples": []
         }
-      ],
-      "intent": "UpdateSeizure"
+      ]
     },
     {
+      "name": "LogSeizure",
+      "samples": [
+        "{Name} is having a {SeizureWord}",
+        "{Name} having a {SeizureWord}",
+        "{Action} {Name} {SeizureWord}",
+        "{Action} a {SeizureWord}",
+        "I'm having a {SeizureWord}",
+        "I am having a {SeizureWord}"
+      ],
       "slots": [
         {
-          "name": "Things",
-          "type": "PLURAL_THINGS"
+          "name": "Action",
+          "type": "SEIZURE_ACTIONS",
+          "samples": []
+        },
+        {
+          "name": "SeizureWord",
+          "type": "SEIZURE_WORDS",
+          "samples": []
         },
         {
           "name": "Name",
-          "type": "AMAZON.US_FIRST_NAME"
+          "type": "AMAZON.US_FIRST_NAME",
+          "samples": []
+        }
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "COUNT_WORDS",
+      "values": [
+        {
+          "name": {
+            "value": "how many"
+          }
         },
         {
-          "name": "Names",
-          "type": "AMAZON.US_FIRST_NAME's"
+          "name": {
+            "value": "count"
+          }
         }
-      ],
-      "intent": "CountSeizures"
+      ]
+    },
+    {
+      "name": "END_WORDS",
+      "values": [
+        {
+          "name": {
+            "value": "over"
+          }
+        },
+        {
+          "name": {
+            "value": "ended"
+          }
+        },
+        {
+          "name": {
+            "value": "passed"
+          }
+        },
+        {
+          "name": {
+            "value": "finished"
+          }
+        },
+        {
+          "name": {
+            "value": "done"
+          }
+        },
+        {
+          "name": {
+            "value": "stopped"
+          }
+        },
+        {
+          "name": {
+            "value": "cleared"
+          }
+        }
+      ]
+    },
+    {
+      "name": "SEIZURE_ACTIONS",
+      "values": [
+        {
+          "name": {
+            "value": "add"
+          }
+        },
+        {
+          "name": {
+            "value": "log"
+          }
+        },
+        {
+          "name": {
+            "value": "track"
+          }
+        },
+        {
+          "name": {
+            "value": "record"
+          }
+        },
+        {
+          "name": {
+            "value": "store"
+          }
+        },
+        {
+          "name": {
+            "value": "report"
+          }
+        }
+      ]
+    },
+    {
+      "name": "SEIZURE_WORDS",
+      "values": [
+        {
+          "name": {
+            "value": "event"
+          }
+        },
+        {
+          "name": {
+            "value": "seizure"
+          }
+        }
+      ]
+    },
+    {
+      "name": "SEIZURE_WORDS_PLURAL",
+      "values": [
+        {
+          "name": {
+            "value": "seizures"
+          }
+        },
+        {
+          "name": {
+            "value": "events"
+          }
+        }
+      ]
     }
-  ]
+  ],
+  "prompts": [
+    {
+      "id": "Elicit.Intent-CountSeizures.IntentSlot-CountWord",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "Please say, 'Ask SeizureTracker to count seizures', to count how many seizures have been tracked today."
+        }
+      ]
+    },
+    {
+      "id": "Elicit.Intent-LogSeizure.IntentSlot-SeizureWord",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "Please say, 'Tell SeizureTracker to track a seizure', if you would like to track a seizure."
+        }
+      ]
+    }
+  ],
+  "dialog": {
+    "version": "1.0",
+    "intents": [
+      {
+        "name": "CountSeizures",
+        "confirmationRequired": false,
+        "prompts": {},
+        "slots": [
+          {
+            "name": "SeizureWords",
+            "type": "SEIZURE_WORDS_PLURAL",
+            "elicitationRequired": false,
+            "confirmationRequired": false,
+            "prompts": {}
+          },
+          {
+            "name": "CountWord",
+            "type": "COUNT_WORDS",
+            "elicitationRequired": true,
+            "confirmationRequired": false,
+            "prompts": {
+              "elicit": "Elicit.Intent-CountSeizures.IntentSlot-CountWord"
+            }
+          },
+          {
+            "name": "Name",
+            "type": "AMAZON.US_FIRST_NAME",
+            "elicitationRequired": false,
+            "confirmationRequired": false,
+            "prompts": {}
+          }
+        ]
+      },
+      {
+        "name": "EndSeizure",
+        "confirmationRequired": false,
+        "prompts": {},
+        "slots": [
+          {
+            "name": "Thing",
+            "type": "SEIZURE_WORDS",
+            "elicitationRequired": false,
+            "confirmationRequired": false,
+            "prompts": {}
+          },
+          {
+            "name": "SeizureWords",
+            "type": "SEIZURE_WORDS_PLURAL",
+            "elicitationRequired": false,
+            "confirmationRequired": false,
+            "prompts": {}
+          },
+          {
+            "name": "EndWord",
+            "type": "END_WORDS",
+            "elicitationRequired": false,
+            "confirmationRequired": false,
+            "prompts": {}
+          },
+          {
+            "name": "Name",
+            "type": "AMAZON.US_FIRST_NAME",
+            "elicitationRequired": false,
+            "confirmationRequired": false,
+            "prompts": {}
+          }
+        ]
+      },
+      {
+        "name": "LogSeizure",
+        "confirmationRequired": false,
+        "prompts": {},
+        "slots": [
+          {
+            "name": "Action",
+            "type": "SEIZURE_ACTIONS",
+            "elicitationRequired": false,
+            "confirmationRequired": false,
+            "prompts": {}
+          },
+          {
+            "name": "SeizureWord",
+            "type": "SEIZURE_WORDS",
+            "elicitationRequired": true,
+            "confirmationRequired": false,
+            "prompts": {
+              "elicit": "Elicit.Intent-LogSeizure.IntentSlot-SeizureWord"
+            }
+          },
+          {
+            "name": "Name",
+            "type": "AMAZON.US_FIRST_NAME",
+            "elicitationRequired": false,
+            "confirmationRequired": false,
+            "prompts": {}
+          }
+        ]
+      }
+    ]
+  }
 }

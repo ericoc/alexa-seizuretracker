@@ -15,10 +15,10 @@ function get_latest_seizure ($api, $user) {
 	// Hit the SeizureTracker API to find the users latest seizure
 	$c = curl_init();
 	curl_setopt($c, CURLOPT_URL, $api->latest_event_url);
-	curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($c, CURLOPT_RETURNTRANSFER, $api->returnxfer);
 	curl_setopt($c, CURLOPT_USERAGENT, $api->user_agent);
-	curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 2);
-	curl_setopt($c, CURLOPT_TIMEOUT, 2);
+	curl_setopt($c, CURLOPT_CONNECTTIMEOUT, $api->timeout);
+	curl_setopt($c, CURLOPT_TIMEOUT, $api->timeout);
 	curl_setopt($c, CURLOPT_USERPWD, $api->user_name . ':' . $api->pass_code);
 	$r = curl_exec($c);
 	$code = curl_getinfo($c, CURLINFO_HTTP_CODE);
@@ -65,10 +65,10 @@ function add_seizure ($api, $user) {
 	curl_setopt($c, CURLOPT_HTTPHEADER, $headers);
 	curl_setopt($c, CURLOPT_CUSTOMREQUEST, 'PUT');
 	curl_setopt($c, CURLOPT_POSTFIELDS, $seizure_json);
-	curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($c, CURLOPT_RETURNTRANSFER, $api->returnxfer);
 	curl_setopt($c, CURLOPT_USERAGENT, $api->user_agent);
-	curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 2);
-	curl_setopt($c, CURLOPT_TIMEOUT, 2);
+	curl_setopt($c, CURLOPT_CONNECTTIMEOUT, $api->timeout);
+	curl_setopt($c, CURLOPT_TIMEOUT, $api->timeout);
 	curl_setopt($c, CURLOPT_USERPWD, $api->user_name . ':' . $api->pass_code);
 	$r = curl_exec($c);
 	$code = curl_getinfo($c, CURLINFO_HTTP_CODE);
@@ -110,10 +110,10 @@ function count_seizures ($api, $user) {
 	// This gives more than the current day, but we check their dates later
 	$c = curl_init();
 	curl_setopt($c, CURLOPT_URL, $api->events_url);
-	curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($c, CURLOPT_RETURNTRANSFER, $api->returnxfer);
 	curl_setopt($c, CURLOPT_USERAGENT, $api->user_agent);
-	curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 2);
-	curl_setopt($c, CURLOPT_TIMEOUT, 2);
+	curl_setopt($c, CURLOPT_CONNECTTIMEOUT, $api->timeout);
+	curl_setopt($c, CURLOPT_TIMEOUT, $api->timeout);
 	curl_setopt($c, CURLOPT_USERPWD, $api->user_name . ':' . $api->pass_code);
 	$r = curl_exec($c);
 	$code = curl_getinfo($c, CURLINFO_HTTP_CODE);

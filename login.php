@@ -11,10 +11,10 @@ function auth_user ($username, $password) {
 
 	$c = curl_init();
 	curl_setopt($c, CURLOPT_URL, $st_api->token_url);
-	curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($c, CURLOPT_RETURNTRANSFER, $st_api->returnxfer);
 	curl_setopt($c, CURLOPT_USERAGENT, $st_api->user_agent);
-	curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 2);
-	curl_setopt($c, CURLOPT_TIMEOUT, 2);
+	curl_setopt($c, CURLOPT_CONNECTTIMEOUT, $st_api->timeout);
+	curl_setopt($c, CURLOPT_TIMEOUT, $st_api->timeout);
 	curl_setopt($c, CURLOPT_USERPWD, $username . ':' . $password);
 	$r = json_decode(curl_exec($c));
 	$code = curl_getinfo($c, CURLINFO_HTTP_CODE);

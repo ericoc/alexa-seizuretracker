@@ -78,5 +78,7 @@ $st_api = (object) array(
 	'user_name'	=>	'REDACTED',
 	'password'	=>	'REDACTED',
 	'user_agent'	=>	'st.ericoc.com testing/1.0 - https://github.com/ericoc/alexa-seizuretracker',
-	'seizure'	=>	$seizure_object
+	'seizure'	=>	$seizure_object,
+	'timeout'	=>	2,
+	'returnxfer'	=>	1
 );

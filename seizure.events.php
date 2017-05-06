@@ -43,7 +43,7 @@ function get_latest_seizure ($api, $user) {
 //
 // Create a function to add a seizure
 //
-function add_seizure ($api, $user, $intent) {
+function add_seizure ($api, $user) {
 
 	// Set the URL for the SeizureTracker events API
 	$api->events_url = $api->base_url . '/Events/Events.php/JSON/' . $api->access_code . '/' . $user;
@@ -203,7 +203,7 @@ function handle_seizure ($user, $intent) {
 	} elseif ($intent->name == 'AddSeizure') {
 
 		// Try to add the seizure
-		$add_seizure = add_seizure($st_api, $user, $intent);
+		$add_seizure = add_seizure($st_api, $user);
 
 		// If it worked and was verified, adding the seizure was successful
 		if ($add_seizure === true) {
@@ -218,7 +218,7 @@ function handle_seizure ($user, $intent) {
 	} elseif ($intent->name == 'EndSeizure') {
 
 		// Try to mark the seizure as having ended
-		$end_seizure = end_seizure($st_api, $user, $intent);
+		$end_seizure = end_seizure($st_api, $user);
 
 		// All set; seizure was updated and marked as over
 		if ($end_seizure === true) {

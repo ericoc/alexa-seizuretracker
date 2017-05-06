@@ -1,6 +1,46 @@
 <?php
 
 //
+// Create a function to get a users latest seizure
+//  which returns one of the following:
+//   1. the seizure object
+//   2. false - if no seizure was found in the past 48 hours
+//   3. null - if there was an API issue
+//
+function get_latest_seizure ($api, $user) {
+
+	// Set the URL for the SeizureTracker latest event API
+	$api->latest_event_url = $api->base_url . '/Events/LastOpenEvent.php/JSON/' . $api->access_code . '/' . $user . '/';
+
+	// Hit the SeizureTracker API to find the users latest seizure
+	$c = curl_init();
+	curl_setopt($c, CURLOPT_URL, $api->latest_event_url);
+	curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($c, CURLOPT_USERAGENT, $api->user_agent);
+	curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 2);
+	curl_setopt($c, CURLOPT_TIMEOUT, 2);
+	curl_setopt($c, CURLOPT_USERPWD, $api->user_name . ':' . $api->pass_code);
+	$r = curl_exec($c);
+	$code = curl_getinfo($c, CURLINFO_HTTP_CODE);
+	curl_close($c);
+
+	// Return false if no latest seizure was returned
+	if ( ($code === 201) || ($r === 'No open events were found in the last 24 hours.') ) {
+		return false;
+	}
+
+	// Proceed only if the latest seizure JSON object actually contains an item
+	$seizure = json_decode($r);
+	$seizure = $seizures->LastOpenSeizure;
+	if ( (isset($seizure)) && (!empty($seizure)) ) {
+		return $seizure;
+	}
+
+	// If we got to this point, something went wrong
+	return null;
+}
+
+//
 // Create a function to add a seizure
 //
 function add_seizure ($api, $user, $intent) {
@@ -37,48 +77,19 @@ function add_seizure ($api, $user, $intent) {
 	// Proceed in checking that a seizure with the timestamp above actually exists meaning that it was added successfully
 	if (isset($r)) {
 
-		// Append the URL parameters to request only the seizures for today from the API
-		$current_day = date('Y-m-d');
-		$api->events_url .= '/?Length=DateRange&Date=' . $current_day . '&StartDate=' . $current_day;
-
-		// Hit the SeizureTracker API again to retrieve seizures
-		// This gives more than we want, but we will check the timestamp later
-		$c = curl_init();
-		curl_setopt($c, CURLOPT_URL, $api->events_url);
-		curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($c, CURLOPT_USERAGENT, $api->user_agent);
-		curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 2);
-		curl_setopt($c, CURLOPT_TIMEOUT, 2);
-		curl_setopt($c, CURLOPT_USERPWD, $api->user_name . ':' . $api->pass_code);
-		$r = curl_exec($c);
-		$code = curl_getinfo($c, CURLINFO_HTTP_CODE);
-		curl_close($c);
-
-		// Proceed if the API responded with a 200 or 201
-		if ( ($code === 200) || ($code === 201) ) {
-
-			// Do not bother if the API did not give any seizures back
-			if ($r !== 'No events were found in time period.') {
-
-				// Proceed only if the seizures JSON object actually contains items
-				$seizures = json_decode($r);
-				$seizures = $seizures->Seizures;
-				if ( (isset($seizures)) && (!empty($seizures)) ) {
-
-					// Loop through every seizure returned by the API
-					foreach ($seizures as $seizure) {
-
-						// If we find a seizure with the timestamp of the one we added, adding a seizure was successful
-						if ($seizure->DateTimeEntered === $timestamp) {
-							return true;
-						}
-					}
-				}
+		// Hit the SeizureTracker API again to retrieve the latest seizure to confirm the seizure addition
+		$latest_seizure = get_latest_seizure($api, $user);
+		if (isset($latest_seizure)) {
+			if (is_object($latest_seizure)) {
+				error_log($latest_seizure);
+				return true;
+			} else {
+				return false;
 			}
 		}
 	}
 
-	// Something weird happened if we haven't returned true by this point
+	// If we got to this point, something went wrong
 	return null;
 }
 

@@ -25,14 +25,14 @@ function get_latest_seizure ($api, $user) {
 	curl_close($c);
 
 	// Return false if no latest seizure was returned
-	if ( ($code === 201) || ($r === 'No open events were found in the last 24 hours.') ) {
+	if ( ($code === 201) && ($r === 'No open events were found in the last 24 hours.') ) {
 		return false;
 	}
 
 	// Proceed only if the latest seizure JSON object actually contains an item
 	$seizure = json_decode($r);
-	$seizure = $seizures->LastOpenSeizure;
 	if ( (isset($seizure)) && (!empty($seizure)) ) {
+		$seizure = $seizure->LastOpenSeizure[0];
 		return $seizure;
 	}
 
@@ -80,8 +80,9 @@ function add_seizure ($api, $user, $intent) {
 		// Hit the SeizureTracker API again to retrieve the latest seizure to confirm the seizure addition
 		$latest_seizure = get_latest_seizure($api, $user);
 		if (isset($latest_seizure)) {
-			if (is_object($latest_seizure)) {
-				error_log($latest_seizure);
+
+			// If the latest seizures timestamp matches, everything worked
+			if ( (is_object($latest_seizure)) && ($latest_seizure->DateTimeEntered === $timestamp) ) {
 				return true;
 			} else {
 				return false;
@@ -104,8 +105,6 @@ function count_seizures ($api, $user) {
 	// Append the URL parameters to request only the seizures for today from the API
 	$current_day = date('Y-m-d');
 	$api->events_url .= '/?Length=DateRange&Date=' . $current_day . '&StartDate=' . $current_day;
-
-	error_log($api->events_url);
 
 	// Hit the SeizureTracker API to retrieve seizures
 	// This gives more than the current day, but we check their dates later

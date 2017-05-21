@@ -152,12 +152,29 @@ function count_seizures ($api, $user) {
 function end_seizure ($api, $user) {
 
 /*
-	TODO: Hit ST API, find most recent seizure, and either:
-			1. update it with an end date OR
-			2. delete it, but create a new seizure with the old one's start date and an accurate end date
-	return: true = success false = failed to find a seizure to mark over, null = unknown error
+	TODO: Make this feature actually work, by marking the latest seizure as over using the SeizureTracker API
+	return: true = successfully marked seizure as having ended, false = failed to find a seizure to mark over, null = unknown error
 */
 
+	// Hit the SeizureTracker API to retrieve the latest seizure so that we can mark it as over
+	$latest_seizure = get_latest_seizure($api, $user);
+	if (isset($latest_seizure)) {
+
+		// If no object was found, there was no seizures found recently to mark as being over?
+		if (!is_object($latest_seizure)) {
+			return false;
+
+		// We found a valid seizure object to work with (and mark as having ended)
+		} else {
+			error_log(print_r($latest_seizure,true));
+			error_log('TODO: Mark the existing seizure as having ended here');
+			return true;
+		}
+
+	// If we got to this point, something went wrong
+	} else {
+		return null;
+	}
 }
 
 //

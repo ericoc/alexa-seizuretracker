@@ -1,6 +1,34 @@
 {
   "intents": [
     {
+      "name": "AddSeizure",
+      "samples": [
+        "{Name} is having a {SeizureWord}",
+        "{Name} having a {SeizureWord}",
+        "{Action} {Name} {SeizureWord}",
+        "{Action} a {SeizureWord}",
+        "I'm having a {SeizureWord}",
+        "I am having a {SeizureWord}"
+      ],
+      "slots": [
+        {
+          "name": "Action",
+          "type": "SEIZURE_ACTIONS",
+          "samples": []
+        },
+        {
+          "name": "SeizureWord",
+          "type": "SEIZURE_WORDS",
+          "samples": []
+        },
+        {
+          "name": "Name",
+          "type": "AMAZON.US_FIRST_NAME",
+          "samples": []
+        }
+      ]
+    },
+    {
       "name": "AMAZON.CancelIntent",
       "samples": []
     },
@@ -84,34 +112,6 @@
         {
           "name": "EndWord",
           "type": "END_WORDS",
-          "samples": []
-        },
-        {
-          "name": "Name",
-          "type": "AMAZON.US_FIRST_NAME",
-          "samples": []
-        }
-      ]
-    },
-    {
-      "name": "AddSeizure",
-      "samples": [
-        "{Name} is having a {SeizureWord}",
-        "{Name} having a {SeizureWord}",
-        "{Action} {Name} {SeizureWord}",
-        "{Action} a {SeizureWord}",
-        "I'm having a {SeizureWord}",
-        "I am having a {SeizureWord}"
-      ],
-      "slots": [
-        {
-          "name": "Action",
-          "type": "SEIZURE_ACTIONS",
-          "samples": []
-        },
-        {
-          "name": "SeizureWord",
-          "type": "SEIZURE_WORDS",
           "samples": []
         },
         {
@@ -246,17 +246,6 @@
   ],
   "prompts": [
     {
-      "id": "Elicit.Intent-CountSeizures.IntentSlot-CountWord",
-      "promptVersion": "1.0",
-      "definitionVersion": "1.0",
-      "variations": [
-        {
-          "type": "PlainText",
-          "value": "Please say, 'Ask SeizureTracker to count seizures', to count how many seizures have been tracked today."
-        }
-      ]
-    },
-    {
       "id": "Elicit.Intent-AddSeizure.IntentSlot-SeizureWord",
       "promptVersion": "1.0",
       "definitionVersion": "1.0",
@@ -266,11 +255,52 @@
           "value": "Please say, 'Tell SeizureTracker to track a seizure', if you would like to track a seizure."
         }
       ]
+    },
+    {
+      "id": "Elicit.Intent-CountSeizures.IntentSlot-CountWord",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "Please say, 'Ask SeizureTracker to count seizures', to count how many seizures have been tracked today."
+        }
+      ]
     }
   ],
   "dialog": {
     "version": "1.0",
     "intents": [
+      {
+        "name": "AddSeizure",
+        "confirmationRequired": false,
+        "prompts": {},
+        "slots": [
+          {
+            "name": "Action",
+            "type": "SEIZURE_ACTIONS",
+            "elicitationRequired": false,
+            "confirmationRequired": false,
+            "prompts": {}
+          },
+          {
+            "name": "SeizureWord",
+            "type": "SEIZURE_WORDS",
+            "elicitationRequired": true,
+            "confirmationRequired": false,
+            "prompts": {
+              "elicit": "Elicit.Intent-AddSeizure.IntentSlot-SeizureWord"
+            }
+          },
+          {
+            "name": "Name",
+            "type": "AMAZON.US_FIRST_NAME",
+            "elicitationRequired": false,
+            "confirmationRequired": false,
+            "prompts": {}
+          }
+        ]
+      },
       {
         "name": "CountSeizures",
         "confirmationRequired": false,
@@ -326,36 +356,6 @@
             "elicitationRequired": false,
             "confirmationRequired": false,
             "prompts": {}
-          },
-          {
-            "name": "Name",
-            "type": "AMAZON.US_FIRST_NAME",
-            "elicitationRequired": false,
-            "confirmationRequired": false,
-            "prompts": {}
-          }
-        ]
-      },
-      {
-        "name": "AddSeizure",
-        "confirmationRequired": false,
-        "prompts": {},
-        "slots": [
-          {
-            "name": "Action",
-            "type": "SEIZURE_ACTIONS",
-            "elicitationRequired": false,
-            "confirmationRequired": false,
-            "prompts": {}
-          },
-          {
-            "name": "SeizureWord",
-            "type": "SEIZURE_WORDS",
-            "elicitationRequired": true,
-            "confirmationRequired": false,
-            "prompts": {
-              "elicit": "Elicit.Intent-AddSeizure.IntentSlot-SeizureWord"
-            }
           },
           {
             "name": "Name",

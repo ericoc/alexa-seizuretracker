@@ -166,9 +166,51 @@ function end_seizure ($api, $user) {
 
 		// We found a valid seizure object to work with (and mark as having ended)
 		} else {
-			error_log(print_r($latest_seizure,true));
-			error_log('TODO: Mark the existing seizure as having ended here');
-			return true;
+
+			// Set the URL for the SeizureTracker events API
+			$api->events_url = $api->base_url . '/Events/Events.php/JSON/' . $api->access_code . '/' . $user;
+
+			// Use current timestamp and build the seizure object as JSON
+			$timestamp = date('Y-m-d H:i:s');
+			$api->seizure->LastUpdated = $timestamp;
+			$build_seizure = (object) array('Seizures' => array($api->seizure));
+			$seizure_json = json_encode($build_seizure, JSON_PRETTY_PRINT);
+
+			// HTTP request headers for hitting the SeizureTracker API
+			$headers = array('Content-type: application/json', 'Content-Length: ' . strlen($seizure_json));
+
+			// Hit the SeizureTracker API to mark the seizure as over
+			$c = curl_init();
+			curl_setopt($c, CURLOPT_URL, $api->events_url);
+			curl_setopt($c, CURLOPT_HTTPHEADER, $headers);
+			curl_setopt($c, CURLOPT_CUSTOMREQUEST, 'PUT');
+			curl_setopt($c, CURLOPT_POSTFIELDS, $seizure_json);
+			curl_setopt($c, CURLOPT_RETURNTRANSFER, $api->returnxfer);
+			curl_setopt($c, CURLOPT_USERAGENT, $api->user_agent);
+			curl_setopt($c, CURLOPT_CONNECTTIMEOUT, $api->timeout);
+			curl_setopt($c, CURLOPT_TIMEOUT, $api->timeout);
+			curl_setopt($c, CURLOPT_USERPWD, $api->user_name . ':' . $api->pass_code);
+			$r = curl_exec($c);
+			$code = curl_getinfo($c, CURLINFO_HTTP_CODE);
+			curl_close($c);
+
+			// Proceed in checking that the seizure was successfully marked as over
+			if (isset($r)) {
+
+				// Hit the SeizureTracker API again to retrieve the latest seizure to confirm the seizure update
+				$latest_seizure = get_latest_seizure($api, $user);
+				if (isset($latest_seizure)) {
+
+					// If the updated timestamp timestamp matches, everything worked
+					if ( (is_object($latest_seizure)) && ($latest_seizure->LastUpdated === $timestamp) ) {
+						return true;
+
+					// Otherwise, something went wrong
+					} else {
+						return null;
+					}
+				}
+			}
 		}
 
 	// If we got to this point, something went wrong

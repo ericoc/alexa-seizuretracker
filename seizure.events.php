@@ -49,10 +49,9 @@ function add_seizure ($api, $user) {
 	$api->events_url = $api->base_url . '/Events/Events.php/JSON/' . $api->access_code . '/' . $user;
 
 	// Use current timestamp and build the seizure object as JSON
-	$timestamp = date('Y-m-d H:i:s');
-	$api->seizure->Date_Time = $timestamp;
-	$api->seizure->DateTimeEntered = $timestamp;
-	$api->seizure->LastUpdated = $timestamp;
+	$api->seizure->Date_Time = $api->timestamp;
+	$api->seizure->DateTimeEntered = $api->gmt_timestamp;
+	$api->seizure->LastUpdated = $api->gmt_timestamp;
 	$build_seizure = (object) array('Seizures' => array($api->seizure));
 	$seizure_json = json_encode($build_seizure, JSON_PRETTY_PRINT);
 
@@ -74,7 +73,7 @@ function add_seizure ($api, $user) {
 	$code = curl_getinfo($c, CURLINFO_HTTP_CODE);
 	curl_close($c);
 
-	// Proceed in checking that a seizure with the timestamp above actually exists meaning that it was added successfully
+	// Proceed in checking that a seizure with the current timestamp actually exists meaning that it was added successfully
 	if (isset($r)) {
 
 		// Hit the SeizureTracker API again to retrieve the latest seizure to confirm the seizure addition
@@ -82,7 +81,7 @@ function add_seizure ($api, $user) {
 		if (isset($latest_seizure)) {
 
 			// If the latest seizures timestamp matches, everything worked
-			if ( (is_object($latest_seizure)) && ($latest_seizure->DateTimeEntered === $timestamp) ) {
+			if ( (is_object($latest_seizure)) && ($latest_seizure->DateTimeEntered === $api->gmt_timestamp) ) {
 				return true;
 			} else {
 				return false;
@@ -151,72 +150,66 @@ function count_seizures ($api, $user) {
 //
 function end_seizure ($api, $user) {
 
-/*
-	TODO: Make this feature actually work, by marking the latest seizure as over using the SeizureTracker API
-	return: true = successfully marked seizure as having ended, false = failed to find a seizure to mark over, null = unknown error
-*/
-
 	// Hit the SeizureTracker API to retrieve the latest seizure so that we can mark it as over
 	$latest_seizure = get_latest_seizure($api, $user);
-	if (isset($latest_seizure)) {
 
-		// If no object was found, there was no seizures found recently to mark as being over?
-		if (!is_object($latest_seizure)) {
-			return false;
+	// If no object was found, there were no seizures found recently to mark as being over so do not bother continuing
+	if ( (isset($latest_seizure)) && (!is_object($latest_seizure)) ) {
+		return false;
+	}
 
-		// We found a valid seizure object to work with (and mark as having ended)
+
+	// Otherwise, we found a valid seizure object to work with (and mark as having ended) so set the URL for the SeizureTracker events API
+	$api->events_url = $api->base_url . '/Events/Events.php/JSON/' . $api->access_code . '/' . $user;
+
+	// Use current timestamp to modify the latest seizure object
+	$latest_seizure->LastUpdated = $api->gmt_timestamp;
+
+	/*
+		TODO:
+			Actually update length_hr/length_min/length_sec fields of the seizure object
+			right now, this feature/function only updates the LastUpdated field of the seizure event on SeizureTracker
+			I should also have this verify earlier that the latest seizure does not have all zeroes for the length_hr/length_min/length_sec
+	*/
+
+	// Build the updated seizure object as JSON
+	$build_seizure = (object) array('Seizures' => array($latest_seizure));
+	$seizure_json = json_encode($build_seizure, JSON_PRETTY_PRINT);
+
+	// HTTP request headers for hitting the SeizureTracker API
+	$headers = array('Content-type: application/json', 'Content-Length: ' . strlen($seizure_json));
+
+	// Hit the SeizureTracker API to mark the seizure as over
+	$c = curl_init();
+	curl_setopt($c, CURLOPT_URL, $api->events_url);
+	curl_setopt($c, CURLOPT_HTTPHEADER, $headers);
+	curl_setopt($c, CURLOPT_CUSTOMREQUEST, 'PUT');
+	curl_setopt($c, CURLOPT_POSTFIELDS, $seizure_json);
+	curl_setopt($c, CURLOPT_RETURNTRANSFER, $api->returnxfer);
+	curl_setopt($c, CURLOPT_USERAGENT, $api->user_agent);
+	curl_setopt($c, CURLOPT_CONNECTTIMEOUT, $api->timeout);
+	curl_setopt($c, CURLOPT_TIMEOUT, $api->timeout);
+	curl_setopt($c, CURLOPT_USERPWD, $api->user_name . ':' . $api->pass_code);
+	$r = curl_exec($c);
+	$code = curl_getinfo($c, CURLINFO_HTTP_CODE);
+	curl_close($c);
+
+	// Proceed in checking that the seizure was successfully marked as over
+	if ( ($code === 200) || ($code === 201) || ($code === 202) ) {
+
+		// Hit the SeizureTracker API to retrieve the latest seizure again to confirm the seizure update
+		$check_latest = get_latest_seizure($api, $user);
+
+		// If the updated timestamp matches, everything worked and we are done
+		if ( (isset($check_latest)) && (is_object($check_latest)) && ($check_latest->LastUpdated === $api->gmt_timestamp) ) {
+			return true;
 		} else {
-
-			// Set the URL for the SeizureTracker events API
-			$api->events_url = $api->base_url . '/Events/Events.php/JSON/' . $api->access_code . '/' . $user;
-
-			// Use current timestamp and build the seizure object as JSON
-			$timestamp = date('Y-m-d H:i:s');
-			$api->seizure->LastUpdated = $timestamp;
-			$build_seizure = (object) array('Seizures' => array($api->seizure));
-			$seizure_json = json_encode($build_seizure, JSON_PRETTY_PRINT);
-
-			// HTTP request headers for hitting the SeizureTracker API
-			$headers = array('Content-type: application/json', 'Content-Length: ' . strlen($seizure_json));
-
-			// Hit the SeizureTracker API to mark the seizure as over
-			$c = curl_init();
-			curl_setopt($c, CURLOPT_URL, $api->events_url);
-			curl_setopt($c, CURLOPT_HTTPHEADER, $headers);
-			curl_setopt($c, CURLOPT_CUSTOMREQUEST, 'PUT');
-			curl_setopt($c, CURLOPT_POSTFIELDS, $seizure_json);
-			curl_setopt($c, CURLOPT_RETURNTRANSFER, $api->returnxfer);
-			curl_setopt($c, CURLOPT_USERAGENT, $api->user_agent);
-			curl_setopt($c, CURLOPT_CONNECTTIMEOUT, $api->timeout);
-			curl_setopt($c, CURLOPT_TIMEOUT, $api->timeout);
-			curl_setopt($c, CURLOPT_USERPWD, $api->user_name . ':' . $api->pass_code);
-			$r = curl_exec($c);
-			$code = curl_getinfo($c, CURLINFO_HTTP_CODE);
-			curl_close($c);
-
-			// Proceed in checking that the seizure was successfully marked as over
-			if (isset($r)) {
-
-				// Hit the SeizureTracker API again to retrieve the latest seizure to confirm the seizure update
-				$latest_seizure = get_latest_seizure($api, $user);
-				if (isset($latest_seizure)) {
-
-					// If the updated timestamp timestamp matches, everything worked
-					if ( (is_object($latest_seizure)) && ($latest_seizure->LastUpdated === $timestamp) ) {
-						return true;
-
-					// Otherwise, something went wrong
-					} else {
-						return null;
-					}
-				}
-			}
+			error_log("Error ($code) failed due to: $r");
 		}
+	}
 
 	// If we got to this point, something went wrong
-	} else {
-		return null;
-	}
+	return null;
 }
 
 //

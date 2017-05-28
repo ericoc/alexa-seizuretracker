@@ -80,5 +80,7 @@ $st_api = (object) array(
 	'user_agent'	=>	'st.ericoc.com testing/1.0 - https://github.com/ericoc/alexa-seizuretracker',
 	'seizure'	=>	$seizure_object,
 	'timeout'	=>	2,
-	'returnxfer'	=>	1
+	'returnxfer'	=>	1,
+	'timestamp'	=>	date('Y-m-d H:i:s'),
+	'gmt_timestamp'	=>	gmdate('Y-m-d H:i:s')
 );

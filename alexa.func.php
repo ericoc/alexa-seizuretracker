@@ -1,7 +1,7 @@
 <?php
 
 // Set a default response message to be used and passed in to the alexa_out() function
-$default_message = 'Please say, "Tell SeizureTracker to track a seizure", if you would like to track a seizure.';
+$default_message = 'Please say, "track a seizure", if you would like to track a seizure.';
 
 // Define a function to create JSON for Alexa to interpret
 function alexa_out ($speech, $card_title, $card_phrase, $reprompt_speech = null, $end_session = true, $redirect_url = null) {

@@ -17,7 +17,7 @@ if ( (isset($input->session->user->userId)) && (!empty($input->session->user->us
 	error_log(print_r($input->request->intent, true));
 
 	// Tell the user how to track a seizure if they provided no intent
-	if ($intent->name == 'AMAZON.HelpIntent') {
+	if ($input->request->intent->name == 'AMAZON.HelpIntent') {
 		$out = $default_message;
 		$end_session = false;
 
@@ -52,6 +52,7 @@ if ( (isset($input->session->user->userId)) && (!empty($input->session->user->us
 if ( (!isset($out)) && (isset($message)) ) {
 	error_log($message);
 	$out = alexa_out($message, 'SeizureTracker', $message, null, $end_session);
+	error_log($out);
 } else {
 	error_log('Account is not linked');
 }

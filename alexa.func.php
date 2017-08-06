@@ -17,8 +17,8 @@ function alexa_out ($speech, $card_title, $card_phrase, $reprompt_speech = null,
 	$reprompt = array('outputSpeech' => array('type' => 'PlainText', 'text' => $reprompt_speech));
 
 	// Create final array combining above arrays before it gets turned in to JSON
-	$response = array('outputSpeech' => $output_speech, 'card' => $card, 'reprompt' => $reprompt_speech);
-	$final = array('version' => '0.1', 'sessionAttributes' => array(), 'response' => $response, 'shouldEndSession' => $end_session);
+	$response = array('outputSpeech' => $output_speech, 'card' => $card, 'reprompt' => $reprompt_speech, 'shouldEndSession' => $end_session);
+	$final = array('version' => '0.1', 'sessionAttributes' => array(), 'response' => $response);
 
 	// Turn the final array in to JSON and send it back to Amazon/Alexa
 	$output = json_encode($final, JSON_PRETTY_PRINT);

@@ -20,7 +20,7 @@ $default_message = 'Please say, "track a seizure", if you would like to track a 
 $end_session = true;
 
 // Set a failure message immediately if the validation fails
-if (alexa_validate($raw_input) !== true) {
+if (alexa_validate($raw_input, $input->request->timestamp) !== true) {
 	$message = 'Sorry. An invalid request was detected.';
 
 // Proceed if it is a somewhat valid request

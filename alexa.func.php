@@ -1,14 +1,14 @@
 <?php
 
 // Define a function to validate Alexa HTTP requests
-function alexa_validate($raw_input) {
+function alexa_validate ($raw_input, $timestamp) {
 
 	// Immediately fail if either of the two required HTTP headers ("Signature" and "SignatureCertChainUrl") are missing
 	if ( (!isset($_SERVER['HTTP_SIGNATURE'])) || (!isset($_SERVER['HTTP_SIGNATURECERTCHAINURL'])) ) {
 		return false;
 
 	// Validate the Alexa timestamp in the HTTP request is recent
-	} elseif (alexa_validate_timestamp($raw_input) !== true) {
+	} elseif (alexa_validate_timestamp($timestamp) !== true) {
 		return false;
 
 	// Validate the Alexa SignatureCertChainUrl HTTP request header value
@@ -27,11 +27,7 @@ function alexa_validate($raw_input) {
 }
 
 // Define a function to validate that the timestamp within the Alexa HTTP request is recent
-function alexa_validate_timestamp ($raw_input) {
-
-	// Decode the JSON of the input and pull out the timestamp within the JSON
-	$input = json_decode($raw_input);
-	$timestamp = $input->request->timestamp;
+function alexa_validate_timestamp ($timestamp) {
 
 	// Ensure that the timestamp from within the HTTP request JSON is within the past minute
 	if (time() - strtotime($timestamp) > 60) {

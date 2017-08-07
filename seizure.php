@@ -14,7 +14,8 @@ error_log('--- END HEADERS ---');
 $input = json_decode(file_get_contents("php://input"));
 error_log(print_r($input, true));
 
-// By default, we always end the session
+// Set a default message in case of errors - and we always end the session by default
+$default_message = 'Please say, "track a seizure", if you would like to track a seizure.';
 $end_session = true;
 
 // Proceed if it is a somewhat valid request

@@ -1,8 +1,5 @@
 <?php
 
-// Set a default response message to be used and passed in to the alexa_out() function
-$default_message = 'Please say, "track a seizure", if you would like to track a seizure.';
-
 // Define a function to create JSON for Alexa to interpret
 function alexa_out ($speech, $card_title, $card_phrase, $reprompt_speech = null, $end_session = true, $redirect_url = null) {
 
@@ -25,6 +22,10 @@ function alexa_out ($speech, $card_title, $card_phrase, $reprompt_speech = null,
 	return $output;
 }
 
+/*
+
+This is not currently used
+
 // Define a function to create JSON for Alexa Flash Briefing skills
 function briefing_out ($uid, $update_date, $title_text, $main_text, $redirect_url = null) {
 
@@ -33,6 +34,7 @@ function briefing_out ($uid, $update_date, $title_text, $main_text, $redirect_ur
 	$output = json_encode($final, JSON_PRETTY_PRINT);
 	return $output;
 }
+*/
 
 // Define a function to create JSON for an Alexa card and instructions to users who have not linked their account
 function alexa_link_out ($speech) {

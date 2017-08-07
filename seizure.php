@@ -11,15 +11,20 @@ foreach (getallheaders() as $name => $value) {
 error_log('--- END HEADERS ---');
 
 // Get the input from Alexa and JSON-decode it before logging it
-$input = json_decode(file_get_contents("php://input"));
+$raw_input = file_get_contents("php://input");
+$input = json_decode($raw_input);
 error_log(print_r($input, true));
 
 // Set a default message in case of errors - and we always end the session by default
 $default_message = 'Please say, "track a seizure", if you would like to track a seizure.';
 $end_session = true;
 
+// Set a failure message immediately if the validation fails
+if (alexa_validate($raw_input) !== true) {
+	$message = 'Sorry. An invalid request was detected.';
+
 // Proceed if it is a somewhat valid request
-if ( (isset($input->session->user->userId)) && (!empty($input->session->user->userId)) && (isset($input->request->intent)) && (isset($input->request->intent->name)) ) {
+} elseif ( (isset($input->session->user->userId)) && (!empty($input->session->user->userId)) && (isset($input->request->intent)) && (isset($input->request->intent->name)) ) {
 
 	// Tell the user how to track a seizure, and allow for a quick response, if they provided no intent
 	if ($input->request->intent->name == 'AMAZON.HelpIntent') {

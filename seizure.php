@@ -3,8 +3,16 @@
 // Include base Alexa response functions
 require_once('alexa.func.php');
 
-// Get the input from Alexa and JSON-decode it
+// Log all HTTP request headers
+error_log('--- BEGIN HEADERS ---');
+foreach (getallheaders() as $name => $value) {
+	error_log($name . ' : ' . $value);
+}
+error_log('--- END HEADERS ---');
+
+// Get the input from Alexa and JSON-decode it before logging it
 $input = json_decode(file_get_contents("php://input"));
+error_log(print_r($input, true));
 
 // By default, we always end the session
 $end_session = true;
@@ -12,11 +20,7 @@ $end_session = true;
 // Proceed if it is a somewhat valid request
 if ( (isset($input->session->user->userId)) && (!empty($input->session->user->userId)) && (isset($input->request->intent)) && (isset($input->request->intent->name)) ) {
 
-	// Logging for debugging
-	error_log(print_r($input->session->user->accessToken, true));
-	error_log(print_r($input->request->intent, true));
-
-	// Tell the user how to track a seizure if they provided no intent
+	// Tell the user how to track a seizure, and allow for a quick response, if they provided no intent
 	if ($input->request->intent->name == 'AMAZON.HelpIntent') {
 		$out = $default_message;
 		$end_session = false;
@@ -42,22 +46,21 @@ if ( (isset($input->session->user->userId)) && (!empty($input->session->user->us
 		}
 	}
 
-// Otherwise, tell the user how to track a seizure upon invalid input
+// Otherwise, tell the user how to track a seizure upon any sort of invalid input and allow for a quick response
 } else {
 	$message = $default_message;
 	$end_session = false;
 }
 
-// If $out was not already defined by the account link function, generate it now using $message
+// If $out was not already defined (because account linking was not done), generate it now using $message
 if ( (!isset($out)) && (isset($message)) ) {
-	error_log($message);
 	$out = alexa_out($message, 'SeizureTracker', $message, null, $end_session);
-	error_log($out);
-} else {
-	error_log('Account is not linked');
 }
-error_log("\n---\n");
 
-// The output is always JSON, return it either way
+// Log what is being returned
+error_log($out);
+error_log("\n=====\n");
+
+// The output is always JSON, return it as such
 header('Content-Type: application/json;charset=UTF-8');
 echo "$out\n";

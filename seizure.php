@@ -20,11 +20,11 @@ $default_message = 'Please say, "track a seizure", if you would like to track a 
 $end_session = true;
 
 // Set a failure message immediately if the validation fails
-if (alexa_validate($raw_input, $input->request->timestamp) !== true) {
+if ( (!isset($input->request->timestamp)) || (alexa_validate($raw_input, $input->request->timestamp) !== true) ) {
 	$message = 'Sorry. An invalid request was detected.';
 
 // Proceed if it is a somewhat valid request
-} elseif ( (isset($input->session->user->userId)) && (!empty($input->session->user->userId)) && (isset($input->request->intent)) && (isset($input->request->intent->name)) ) {
+} elseif ( (isset($input->session->user->userId, $input->request->intent, $input->request->intent->name)) && (!empty($input->session->user->userId)) ) {
 
 	// Tell the user how to track a seizure, and allow for a quick response, if they provided no intent
 	if ($input->request->intent->name == 'AMAZON.HelpIntent') {

@@ -7,7 +7,7 @@ function alexa_validate ($raw_input, $timestamp) {
 	if ( (!isset($_SERVER['HTTP_SIGNATURE'])) || (!isset($_SERVER['HTTP_SIGNATURECERTCHAINURL'])) ) {
 		return false;
 
-	// Validate the Alexa timestamp in the HTTP request is recent
+	// Validate that the timestamp value in the Alexa HTTP request is recent
 	} elseif (alexa_validate_timestamp($timestamp) !== true) {
 		return false;
 

@@ -24,12 +24,17 @@ if ( (!isset($input->request->timestamp)) || (alexa_validate($raw_input, $input-
 	http_response_code(400);
 	$message = 'Sorry. An invalid request was detected.';
 
+// Handle session ended requests
+} elseif ( (isset($input->request->type)) && ($input->request->type === 'SessionEndedRequest') ) {
+	$message = 'Session ended request received.';
+	error_log('SESSION ENDED REQUEST');
+
 // Proceed if it is a somewhat valid request
 } elseif ( (isset($input->session->user->userId, $input->request->intent, $input->request->intent->name)) && (!empty($input->session->user->userId)) ) {
 
 	// Tell the user how to track a seizure, and allow for a quick response, if they provided no intent
 	if ($input->request->intent->name == 'AMAZON.HelpIntent') {
-		$out = $default_message;
+		$message = $default_message;
 		$end_session = false;
 
 	// Tell the user to link their SeizureTracker account if no accessToken was found or their accessToken is not a string

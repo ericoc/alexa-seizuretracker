@@ -21,6 +21,7 @@ $end_session = true;
 
 // Set a failure message immediately if the validation fails
 if ( (!isset($input->request->timestamp)) || (alexa_validate($raw_input, $input->request->timestamp) !== true) ) {
+	http_response_code(400);
 	$message = 'Sorry. An invalid request was detected.';
 
 // Proceed if it is a somewhat valid request

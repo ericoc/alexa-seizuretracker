@@ -5,25 +5,31 @@ function alexa_validate ($raw_input, $timestamp) {
 
 	// Immediately fail if either of the two required HTTP headers ("Signature" and "SignatureCertChainUrl") are missing
 	if ( (!isset($_SERVER['HTTP_SIGNATURE'])) || (!isset($_SERVER['HTTP_SIGNATURECERTCHAINURL'])) ) {
-		return false;
+		$return = false;
 
 	// Validate that the timestamp value in the Alexa HTTP request is recent
 	} elseif (alexa_validate_timestamp($timestamp) !== true) {
-		return false;
+		$return = false;
 
 	// Validate the Alexa SignatureCertChainUrl HTTP request header value
 	} elseif (alexa_validate_signature_url($_SERVER['HTTP_SIGNATURECERTCHAINURL']) !== true) {
-		return false;
+		$return = false;
 
 	// Validate the contents of the SignatureCertChainUrl
 	} elseif (alexa_validate_signature($raw_input, $_SERVER['HTTP_SIGNATURE'], $_SERVER['HTTP_SIGNATURECERTCHAINURL']) !== true) {
-		return false;
+		$return = false;
 
 	// Return true if all above checks pass
 	} else {
-		return true;
+		$return = true;
 	}
 
+	// Set the HTTP response code to 400 if validation failed
+	if ($return === false) {
+		http_response_code(400);
+	}
+
+	return $return;
 }
 
 // Define a function to validate that the timestamp within the Alexa HTTP request is recent

@@ -7,6 +7,10 @@ function alexa_validate ($raw_input, $timestamp) {
 	if ( (!isset($_SERVER['HTTP_SIGNATURE'])) || (!isset($_SERVER['HTTP_SIGNATURECERTCHAINURL'])) ) {
 		return false;
 
+	// Fail if either of the two required HTTP headers are empty
+	} elseif ( (empty(trim($_SERVER['HTTP_SIGNATURE']))) || (empty(trim($_SERVER['HTTP_SIGNATURECERTCHAINURL']))) ) {
+		return false;
+
 	// Validate that the timestamp value in the Alexa HTTP request is recent
 	} elseif (alexa_validate_timestamp($timestamp) !== true) {
 		return false;
@@ -117,14 +121,33 @@ function alexa_validate_signature ($raw_input, $signature, $url) {
 	return true;
 }
 
+// Define a function to build an Alexa "card" array for use within alexa_out
+function alexa_build_card ($card_content, $card_type = 'Simple', $card_title = 'SeizureTracker') {
+
+	// Handle LinkAccount cards (used when the user has not linked their account)
+	if ($card_type === 'LinkAccount') {
+		$card = array('type' => 'LinkAccount');
+
+	// Set to false if the card content is missing/empty
+	} elseif ( (!isset($card_content)) || (empty(trim($card_content))) ) {
+		$card = false;
+
+	// Crate a proper card array if all is well
+	} else {
+		$card = array('type' => $card_type, 'title' => $card_title, 'content' => $card_content);
+	}
+
+	// Return what ever we came up with
+	return $card;
+}
+
 // Define a function to create JSON for Alexa to interpret
-function alexa_out ($speech, $card_title, $card_phrase, $reprompt_speech = null, $end_session = true, $redirect_url = null) {
+// The speech to be returned is passed in as the first parameter
+// The card array is passed in as the second parameter
+function alexa_out ($speech, $card, $reprompt_speech = null, $end_session = true, $redirect_url = null) {
 
 	// Create the outputSpeech array (This is what Alexa says in response)
 	$output_speech = array('type' => 'PlainText', 'text' => $speech);
-
-	// Create the card array (This is shown at alexa.amazon.com and within the app)
-	$card = array( 'type' => 'Simple', 'title' => $card_title, 'content' => $card_phrase);
 
 	// Create a null (unused/empty) reprompt array
 	// (This is used for follow up respones in a proper conversation... I'm not there yet)
@@ -135,22 +158,6 @@ function alexa_out ($speech, $card_title, $card_phrase, $reprompt_speech = null,
 	$final = array('version' => '0.1', 'sessionAttributes' => array(), 'response' => $response);
 
 	// Turn the final array in to JSON and send it back to Amazon/Alexa
-	$output = json_encode($final, JSON_PRETTY_PRINT);
-	return $output;
-}
-
-// Define a function to create JSON for an Alexa card and instructions to users who have not linked their account
-function alexa_link_out ($speech) {
-
-	// Create the outputSpeech array (This is what Alexa says in response)
-	$output_speech = array('type' => 'PlainText', 'text' => $speech);
-
-	// Create the card array (This is shown at alexa.amazon.com and within the app)
-	$card = array('type' => 'LinkAccount');
-
-	// Create final arrays
-	$response = array('outputSpeech' => $output_speech, 'card' => $card,);
-	$final = array('version' => '0.1', 'sessionAttributes' => array(), 'response' => $response);
 	$output = json_encode($final, JSON_PRETTY_PRINT);
 	return $output;
 }

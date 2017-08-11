@@ -132,7 +132,7 @@ function alexa_build_card ($card_content = null, $card_type = 'Simple', $card_ti
 	} elseif ( (!isset($card_content)) || (empty(trim($card_content))) || ($card_content === null) ) {
 		$card = null;
 
-	// Crate a proper card array if all is well
+	// Create a proper card array if all is well
 	} else {
 		$card = array('type' => $card_type, 'title' => $card_title, 'content' => $card_content);
 	}

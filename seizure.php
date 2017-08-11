@@ -16,18 +16,21 @@ $input = json_decode($raw_input);
 error_log(print_r($input, true));
 
 // Set a default message in case of errors - and we always end the session by default
-// Default is to not send a card as well
 $default_message = 'Please say, "track a seizure", if you would like to track a seizure.';
 $end_session = true;
+
+// Default to not sending a card
 $card_content = null;
 
 // Set a failure message immediately if the validation is not completed successfully
 if ( (!isset($input->request->timestamp)) || (empty(trim($input->request->timestamp))) || (alexa_validate($raw_input, $input->request->timestamp) !== true) ) {
 	http_response_code(400);
 	$message = 'Sorry. An invalid request was detected.';
+	error_log('INVALID REQUEST DETECTED');
 
 // Handle session ended requests
 } elseif ( (isset($input->request->type)) && ($input->request->type === 'SessionEndedRequest') ) {
+	$message = $card = null;
 	error_log('SESSION ENDED REQUEST RECEIVED');
 
 // Proceed if it is a somewhat valid request
@@ -37,6 +40,7 @@ if ( (!isset($input->request->timestamp)) || (empty(trim($input->request->timest
 	if ($input->request->intent->name == 'AMAZON.HelpIntent') {
 		$message = $card_content = $default_message;
 		$end_session = false;
+		error_log('HELP INTENT RECEIVED');
 
 	// Simply end the request if they asked to stop or cancel
 	} elseif ( ($input->request->intent->name == 'AMAZON.CancelIntent') || ($input->request->intent->name == 'AMAZON.StopIntent') ) {
@@ -58,7 +62,7 @@ if ( (!isset($input->request->timestamp)) || (empty(trim($input->request->timest
 		// Set the message awkwardly
 		// (TODO: find a better way of doing this)
 		if ( (isset($handle_seizure)) && (is_string($handle_seizure)) ) {
-			$message = $handle_seizure;
+			$message = $card_content = $handle_seizure;
 
 		// Otherwise there was some unknown error
 		} else {
@@ -70,15 +74,20 @@ if ( (!isset($input->request->timestamp)) || (empty(trim($input->request->timest
 } else {
 	$message = $card_content = $default_message;
 	$end_session = false;
+	error_log('NO INTENT RECEIVED');
 }
 
-// Build the card array if it was not already done and we actually have content for the card
-if ( (!isset($card)) && (isset($card_content)) && ($card_content !== null) ) {
-	$card = alexa_build_card($card_content);
+// Only consider building a card array if it was not already set
+if (!isset($card)) {
 
-// Otherwise the card is not built and will be sent as null
-} else {
-	$card = null;
+	// If we have card content that is not null, build the card using said content
+	if ( (isset($card_content)) && ($card_content !== null) ) {
+		$card = alexa_build_card($card_content);
+
+	// Otherwise, card will be set to null (meaning that it is not sent)
+	} else {
+		$card = null;
+	}
 }
 
 // Build the final complete JSON response to be sent to Amazon/Alexa including the card and message

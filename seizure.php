@@ -53,24 +53,25 @@ if ( (!isset($input->request->timestamp)) || (empty(trim($input->request->timest
 		$card = alexa_build_card($message, 'LinkAccount');
 		error_log('SENDING LINKACCOUNT CARD');
 
+	// Actually handle the seizure/intent if checks above were okay
 	} else {
 
 		// Include required functions and handle the event based on the intent sent from Alexa
 		require_once('seizure.events.php');
 		$handle_seizure = handle_seizure($input->session->user->accessToken, $input->request->intent);
 
-		// Set the message awkwardly
+		// Set the return speech/message awkwardly
 		// (TODO: find a better way of doing this)
 		if ( (isset($handle_seizure)) && (is_string($handle_seizure)) ) {
 			$message = $card_content = $handle_seizure;
 
-		// Otherwise there was some unknown error
+		// Otherwise, there was some unknown error
 		} else {
 			$message = 'Sorry. There was an unknown error.';
 		}
 	}
 
-// Otherwise, tell the user how to track a seizure upon any sort of invalid input and allow for a quick response
+// Tell the user how to track a seizure if there was no intent or upon any sort of invalid input - and allow for a quick response
 } else {
 	$message = $card_content = $default_message;
 	$end_session = false;

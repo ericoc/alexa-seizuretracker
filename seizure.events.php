@@ -248,7 +248,7 @@ function handle_seizure ($user, $intent) {
 		}
 
 	// Add a new seizure, if requested
-	} elseif ($intent->name == 'AddSeizure') {
+	} elseif ( ($intent->name == 'AddSeizure') || ($intent->name == 'AMAZON.YesIntent') ) {
 
 		// Try to add the seizure
 		$add_seizure = add_seizure($st_api, $user);

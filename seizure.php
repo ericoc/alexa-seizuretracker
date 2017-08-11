@@ -38,12 +38,12 @@ if ( (!isset($input->request->timestamp)) || (empty(trim($input->request->timest
 
 	// Tell the user how to track a seizure, and allow for a quick response, if they asked for help
 	if ($input->request->intent->name == 'AMAZON.HelpIntent') {
-		$message = 'Would you like to track a seizure?';
+		$message = $card_content = 'Thank you for using Seizure Tracker! This skill can be used to track a seizure, to note that a seizure is over, and to count seizures in the past day. Would you like to track a seizure now?';
 		$end_session = false;
 		error_log('HELP INTENT RECEIVED');
 
-	// Simply end the request if they asked to stop or cancel
-	} elseif ( ($input->request->intent->name == 'AMAZON.CancelIntent') || ($input->request->intent->name == 'AMAZON.StopIntent') ) {
+	// Simply end the request if they asked to stop or cancel, or responded "no"
+	} elseif ( ($input->request->intent->name == 'AMAZON.CancelIntent') || ($input->request->intent->name == 'AMAZON.StopIntent') || ($input->request->intent->name == 'AMAZON.NoIntent') ) {
 		$message = null;
 		error_log('STOP/CANCEL INTENT RECEIVED');
 

@@ -30,7 +30,7 @@ if ( (!isset($input->request->timestamp)) || (empty(trim($input->request->timest
 
 // Handle session ended requests
 } elseif ( (isset($input->request->type)) && ($input->request->type === 'SessionEndedRequest') ) {
-	$message = $card = null;
+	$message = null;
 	error_log('SESSION ENDED REQUEST RECEIVED');
 
 // Proceed if it is a somewhat valid request
@@ -38,13 +38,13 @@ if ( (!isset($input->request->timestamp)) || (empty(trim($input->request->timest
 
 	// Tell the user how to track a seizure, and allow for a quick response, if they asked for help
 	if ($input->request->intent->name == 'AMAZON.HelpIntent') {
-		$message = $card_content = $default_message;
+		$message = 'Would you like to track a seizure?';
 		$end_session = false;
 		error_log('HELP INTENT RECEIVED');
 
 	// Simply end the request if they asked to stop or cancel
 	} elseif ( ($input->request->intent->name == 'AMAZON.CancelIntent') || ($input->request->intent->name == 'AMAZON.StopIntent') ) {
-		$message = $card = null;
+		$message = null;
 		error_log('STOP/CANCEL INTENT RECEIVED');
 
 	// Tell the user to link their SeizureTracker account if no accessToken was found or their accessToken is not a string
@@ -77,18 +77,8 @@ if ( (!isset($input->request->timestamp)) || (empty(trim($input->request->timest
 	error_log('NO INTENT RECEIVED');
 }
 
-// Only consider building a card array if it was not already set
-if (!isset($card)) {
-
-	// If we have card content that is not null, build the card using said content
-	if ( (isset($card_content)) && ($card_content !== null) ) {
-		$card = alexa_build_card($card_content);
-
-	// Otherwise, card will be set to null (meaning that it is not sent)
-	} else {
-		$card = null;
-	}
-}
+// Build the card for Alexa
+$card = alexa_build_card($card_content);
 
 // Build the final complete JSON response to be sent to Amazon/Alexa including the card and message
 $out = alexa_out($message, $card, null, $end_session);

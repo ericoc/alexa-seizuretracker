@@ -122,15 +122,15 @@ function alexa_validate_signature ($raw_input, $signature, $url) {
 }
 
 // Define a function to build an Alexa "card" array for use within alexa_out
-function alexa_build_card ($card_content, $card_type = 'Simple', $card_title = 'SeizureTracker') {
+function alexa_build_card ($card_content = null, $card_type = 'Simple', $card_title = 'SeizureTracker') {
 
 	// Handle LinkAccount cards (used when the user has not linked their account)
 	if ($card_type === 'LinkAccount') {
 		$card = array('type' => 'LinkAccount');
 
-	// Set to false if the card content is missing/empty
-	} elseif ( (!isset($card_content)) || (empty(trim($card_content))) ) {
-		$card = false;
+	// Set to null if the card content is missing/empty/null
+	} elseif ( (!isset($card_content)) || (empty(trim($card_content))) || ($card_content === null) ) {
+		$card = null;
 
 	// Crate a proper card array if all is well
 	} else {

@@ -1,5 +1,8 @@
 <?php
 
+// The time zone will be UTC throughout the execution of all PHP
+date_default_timezone_set('UTC');
+
 // Include base Alexa response functions
 require_once('alexa.func.php');
 

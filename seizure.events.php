@@ -9,6 +9,9 @@ function calculate_seizure_length ($start, $end) {
 	$start_dt = new DateTime($start);
 	$end_dt = new DateTime($end);
 	$length = $start_dt->diff($end_dt);
+	error_log('START: ' . print_r($start ,true));
+	error_log('END: ' . print_r($end, true));
+	error_log(print_r($length, true));
 	return $length;
 }
 
@@ -105,12 +108,8 @@ function add_seizure ($api, $user) {
 
 		// Blank the GUID and fix up the timestamps and length values on the seizure object we got
 		$new_seizure = $last_seizure;
-		$new_seizure->length_sec = 0;
-		$new_seizure->length_sec = 0;
-		$new_seizure->length_sec = 0;
-		$new_seizure->Date_Time = $api->timestamp;
-		$new_seizure->DateTimeEntered = $api->timestamp;
-		$new_seizure->LastUpdated = $api->timestamp;
+		$new_seizure->length_sec = $new_seizure->length_min = $new_seizure->length_hr = 0;
+		$new_seizure->Date_Time = $new_seizure->DateTimeEntered = $new_seizure->LastUpdated = $api->timestamp;
 		$new_seizure->GUID = '';
 
 	// Otherwise, just use a minimal/blank seizure object
@@ -169,15 +168,15 @@ function add_seizure ($api, $user) {
 //
 function count_seizures ($api, $user) {
 
+	$unix_timestamp = strtotime($api->timestamp);
+	$yesterday = date('Y-m-d', $unix_timestamp-86400);
+	$tomorrow = date('Y-m-d', $unix_timestamp+86400);
+
 	// Set the URL for the SeizureTracker events API
 	$api->events_url = $api->base_url . '/Events/Events.php/JSON/' . $api->access_code . '/' . $user;
-
-	// Append the URL parameters to request only the seizures for today from the API
-	$current_day = date('Y-m-d');
-	$api->events_url .= '/?Length=DateRange&Date=' . $current_day . '&StartDate=' . $current_day;
+	$api->events_url .= '/?Length=DateRange&Date=' . $tomorrow . '&StartDate=' . $yesterday;
 
 	// Hit the SeizureTracker API to retrieve seizures
-	// This gives more than the current day, but we check their dates later
 	$c = curl_init();
 	curl_setopt($c, CURLOPT_URL, $api->events_url);
 	curl_setopt($c, CURLOPT_RETURNTRANSFER, $api->returnxfer);
@@ -198,8 +197,14 @@ function count_seizures ($api, $user) {
 		// Do not bother if the API did not give any seizures back
 		if ($r !== 'No events were found in time period.') {
 
+		        // Fix the JSON in the end of the response when looking for seizures that are not open events...
+		        // NOTE: The API is returning invalid JSON by throwing a comma at the end unncessarily.
+	                $pattern = '/\},\]\}/';
+	                $replace = '}]}';
+	                $body = preg_replace($pattern, $replace, $r);
+
 			// Proceed only if the seizures JSON object actually contains items
-			$seizures = json_decode($r);
+			$seizures = json_decode($body);
 			$seizures = $seizures->Seizures;
 			if ( (isset($seizures)) && (!empty($seizures)) ) {
 				$seizure_count = count($seizures);
@@ -236,7 +241,7 @@ function end_seizure ($api, $user) {
 	// Calculate the length of the seizure to update it when marking the event as over
 	$seizure_length = calculate_seizure_length($latest_seizure->DateTimeEntered, $api->timestamp);
 	$update_seizure->length_sec = $seizure_length->s;
-	$update_seizure->length_min = $seizure_length->m;
+	$update_seizure->length_min = $seizure_length->i;
 	$update_seizure->length_hr = $seizure_length->h;
 
 	// Fix the "LastUpdated" timestamp within the seizure object

@@ -163,6 +163,8 @@ function end_seizure ($api, $user) {
 	$api->events_url = $api->base_url . '/Events/Events.php/JSON/' . $api->access_code . '/' . $user;
 
 	// Use current timestamp to modify the latest seizure object
+	$seizure_length = time() - strtotime($latest_seizure);
+	error_log('SEIZURE LENGTH IN SECONDS: ' . $seizure_length);
 	$latest_seizure->LastUpdated = $api->gmt_timestamp;
 
 	/*
@@ -204,7 +206,7 @@ function end_seizure ($api, $user) {
 		if ( (isset($check_latest)) && (is_object($check_latest)) && ($check_latest->LastUpdated === $api->gmt_timestamp) ) {
 			return true;
 		} else {
-			error_log("Error ($code) failed due to: $r");
+			error_log("Marking seizure as over failed due to: ($code) $r");
 		}
 	}
 
@@ -224,6 +226,7 @@ function handle_seizure ($user, $intent) {
 	if ($intent->name == 'CountSeizures') {
 
 		// Get the count of the current users seizures today
+		error_log('COUNTING SEIZURES');
 		$count_seizures = count_seizures($st_api, $user);
 
 		// All set; return how many seizures were tracked today, using the users own words
@@ -251,6 +254,7 @@ function handle_seizure ($user, $intent) {
 	} elseif ( ($intent->name == 'AddSeizure') || ($intent->name == 'AMAZON.YesIntent') ) {
 
 		// Try to add the seizure
+		error_log('ADDING SEIZURE');
 		$add_seizure = add_seizure($st_api, $user);
 
 		// If it worked and was verified, adding the seizure was successful
@@ -266,6 +270,7 @@ function handle_seizure ($user, $intent) {
 	} elseif ($intent->name == 'EndSeizure') {
 
 		// Try to mark the seizure as having ended
+		error_log('MARKING END OF SEIZURE');
 		$end_seizure = end_seizure($st_api, $user);
 
 		// All set; seizure was updated and marked as over

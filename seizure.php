@@ -57,6 +57,7 @@ if ( (!isset($input->request->timestamp)) || (empty(trim($input->request->timest
 	} else {
 
 		// Include required functions and handle the event based on the intent sent from Alexa
+		error_log('HANDLING SEIZURE');
 		require_once('seizure.events.php');
 		$handle_seizure = handle_seizure($input->session->user->accessToken, $input->request->intent);
 

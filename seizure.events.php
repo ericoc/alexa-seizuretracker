@@ -112,7 +112,7 @@ function add_seizure ($api, $user) {
 	// Otherwise, just use a minimal/blank seizure object
 	} else {
 		error_log('STARTING FROM A MINIMAL/EMPTY SEIZURE');
-		$new_seizure = $api->seizure;
+		require_once('seizure.object.php');
 	}
 
 	// Build the seizure object as JSON

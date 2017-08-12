@@ -1,5 +1,17 @@
 <?php
 
+///
+// Create a function to calculate the length of a seizure using its entered time vs. the current time
+//
+function calculate_seizure_length ($start, $end) {
+
+	// Simply create two DateTime objects, diff them, and return the diff object
+	$start_dt = new DateTime($start);
+	$end_dt = new DateTime($end);
+	$length = $start_dt->diff($end_dt);
+	return $length;
+}
+
 //
 // Create a function to get a users latest seizure
 //  which returns one of the following:
@@ -10,6 +22,7 @@
 function get_latest_seizure ($api, $user) {
 
 	// Set the URL for the SeizureTracker latest event API
+	error_log('GETTING LATEST SEIZURE');
 	$api->latest_event_url = $api->base_url . '/Events/LastOpenEvent.php/JSON/' . $api->access_code . '/' . $user . '/';
 
 	// Hit the SeizureTracker API to find the users latest seizure
@@ -33,6 +46,7 @@ function get_latest_seizure ($api, $user) {
 	$seizure = json_decode($r);
 	if ( (isset($seizure)) && (!empty($seizure)) ) {
 		$seizure = $seizure->LastOpenSeizure[0];
+		error_log(print_r($seizure, true));
 		return $seizure;
 	}
 
@@ -49,9 +63,6 @@ function add_seizure ($api, $user) {
 	$api->events_url = $api->base_url . '/Events/Events.php/JSON/' . $api->access_code . '/' . $user;
 
 	// Use current timestamp and build the seizure object as JSON
-	$api->seizure->Date_Time = $api->timestamp;
-	$api->seizure->DateTimeEntered = $api->gmt_timestamp;
-	$api->seizure->LastUpdated = $api->gmt_timestamp;
 	$build_seizure = (object) array('Seizures' => array($api->seizure));
 	$seizure_json = json_encode($build_seizure, JSON_PRETTY_PRINT);
 
@@ -81,7 +92,7 @@ function add_seizure ($api, $user) {
 		if (isset($latest_seizure)) {
 
 			// If the latest seizures timestamp matches, everything worked
-			if ( (is_object($latest_seizure)) && ($latest_seizure->DateTimeEntered === $api->gmt_timestamp) ) {
+			if ( (is_object($latest_seizure)) && ($latest_seizure->DateTimeEntered === $api->timestamp) ) {
 				return true;
 			} else {
 				return false;
@@ -156,32 +167,30 @@ function end_seizure ($api, $user) {
 	// If no object was found, there were no seizures found recently to mark as being over so do not bother continuing
 	if ( (isset($latest_seizure)) && (!is_object($latest_seizure)) ) {
 		return false;
+
+	// Otherwise, begin modifying the object for the latest seizure so it can be updated and marked as over
+	} else {
+		$update_seizure = $latest_seizure;
 	}
 
+	// Calculate the length of the seizure to update it when marking the event as over
+	$seizure_length = calculate_seizure_length($latest_seizure->DateTimeEntered, $api->timestamp);
+	$update_seizure->length_sec = $seizure_length->s;
+	$update_seizure->length_min = $seizure_length->m;
+	$update_seizure->length_hr = $seizure_length->h;
 
-	// Otherwise, we found a valid seizure object to work with (and mark as having ended) so set the URL for the SeizureTracker events API
-	$api->events_url = $api->base_url . '/Events/Events.php/JSON/' . $api->access_code . '/' . $user;
-
-	// Use current timestamp to modify the latest seizure object
-	$seizure_length = time() - strtotime($latest_seizure);
-	error_log('SEIZURE LENGTH IN SECONDS: ' . $seizure_length);
-	$latest_seizure->LastUpdated = $api->gmt_timestamp;
-
-	/*
-		TODO:
-			Actually update length_hr/length_min/length_sec fields of the seizure object
-			right now, this feature/function only updates the LastUpdated field of the seizure event on SeizureTracker
-			I should also have this verify earlier that the latest seizure does not have all zeroes for the length_hr/length_min/length_sec
-	*/
+	// Fix the "LastUpdated" timestamp within the seizure object
+	$update_seizure->LastUpdated = $api->timestamp;
 
 	// Build the updated seizure object as JSON
-	$build_seizure = (object) array('Seizures' => array($latest_seizure));
+	$build_seizure = (object) array('Seizures' => array($update_seizure));
 	$seizure_json = json_encode($build_seizure, JSON_PRETTY_PRINT);
 
 	// HTTP request headers for hitting the SeizureTracker API
 	$headers = array('Content-type: application/json', 'Content-Length: ' . strlen($seizure_json));
 
 	// Hit the SeizureTracker API to mark the seizure as over
+	$api->events_url = $api->base_url . '/Events/Events.php/JSON/' . $api->access_code . '/' . $user;
 	$c = curl_init();
 	curl_setopt($c, CURLOPT_URL, $api->events_url);
 	curl_setopt($c, CURLOPT_HTTPHEADER, $headers);
@@ -197,17 +206,10 @@ function end_seizure ($api, $user) {
 	curl_close($c);
 
 	// Proceed in checking that the seizure was successfully marked as over
-	if ( ($code === 200) || ($code === 201) || ($code === 202) ) {
-
-		// Hit the SeizureTracker API to retrieve the latest seizure again to confirm the seizure update
-		$check_latest = get_latest_seizure($api, $user);
-
-		// If the updated timestamp matches, everything worked and we are done
-		if ( (isset($check_latest)) && (is_object($check_latest)) && ($check_latest->LastUpdated === $api->gmt_timestamp) ) {
-			return true;
-		} else {
-			error_log("Marking seizure as over failed due to: ($code) $r");
-		}
+	if ( ($code === 202) || ($r === '1 events have been edited on your SeizureTracker.com account.') ) {
+		return true;
+	} else {
+		error_log("ENDING SEIZURE FAILED: ($code) $r");
 	}
 
 	// If we got to this point, something went wrong
@@ -217,7 +219,7 @@ function end_seizure ($api, $user) {
 //
 // Create a function to handle a seizure request sent from Alexa
 //
-function handle_seizure ($user, $intent) {
+function handle_seizure ($user, $intent, $timestamp) {
 
 	// Include the SeizureTracker API settings/credentials
 	require_once('st.api.php');
@@ -270,7 +272,7 @@ function handle_seizure ($user, $intent) {
 	} elseif ($intent->name == 'EndSeizure') {
 
 		// Try to mark the seizure as having ended
-		error_log('MARKING END OF SEIZURE');
+		error_log('ENDING SEIZURE');
 		$end_seizure = end_seizure($st_api, $user);
 
 		// All set; seizure was updated and marked as over

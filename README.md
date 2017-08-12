@@ -74,7 +74,7 @@ Simply select the second option of:
 
 ### Test > Service Simulator
 
-Make sure that "Enabled" is selected so that the skill is enabled on your account to test with your Echo (dot) device.
+Make sure that "Enabled" is selected so that the skill is enabled on your account to test with your Echo (or Echo Dot) device.
 
 Finally, an easy way to test all of the above is to enter a phrase such as one of the following in to the "`Enter Utterance`" field:
 
@@ -91,7 +91,7 @@ Finally, an easy way to test all of the above is to enter a phrase such as one o
 
 ## Conclusion
 
-This Alexa skill should also be available locally on your Echo (dot) device which you can confirm by visiting [alexa.amazon.com](http://alexa.amazon.com/spa/index.html#skills/your-skills/?ref-suffix=ysa_gw), searching for the name of the skill that you set originally, and ensuring that it is Enabled as well as linked to your SeizureTracker.com account.
+This Alexa skill should also be available locally on your Echo (or Echo Dot) device which you can confirm by visiting [alexa.amazon.com](http://alexa.amazon.com/spa/index.html#skills/your-skills/?ref-suffix=ysa_gw), searching for the name of the skill that you set originally, and ensuring that it is Enabled as well as linked to your SeizureTracker.com account.
 
 The only caveat to testing it with your voice on your actual device is that you have to ensure that you are within the Alexa skill by using the invocation word that you set in the beginning. This means that you have to phrase your voice commands like so:
 
@@ -100,6 +100,10 @@ The only caveat to testing it with your voice on your actual device is that you 
   * "*Alexa, ask SeizureTracker to* **count seizures**?"
 
 Different phrasing variations of these all work partially based on words Amazon automatically ignores (like "to" and "the", I think?) as well as the Interaction Model defined so you can try lots of different stuff!
+
+Additionally, you can say "open seizure tracker" (based on the invocation word) which will describe what the skill does allowing you to respond immediately and "track a seizure".
+
+There is also a "help" intent (`"Alexa, ask Seizure Tracker for help") which will describe the functionality of the skill before allowing you to simply respond "yes" to track a seizure!
 
 ---
 

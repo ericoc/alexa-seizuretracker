@@ -1,7 +1,8 @@
 <?php
 
-// The time zone will be UTC throughout the execution of all PHP
+// Set timezone to UTC throughout and get the timestamp
 date_default_timezone_set('UTC');
+$timestamp = date('Y-m-d H:i:s');	// YYYY-MM-DD HH:MM:SS format
 
 // Include base Alexa response functions
 require_once('alexa.func.php');
@@ -62,7 +63,7 @@ if ( (!isset($input->request->timestamp)) || (empty(trim($input->request->timest
 		// Include required functions and handle the event based on the intent sent from Alexa
 		error_log('HANDLING SEIZURE');
 		require_once('seizure.events.php');
-		$handle_seizure = handle_seizure($input->session->user->accessToken, $input->request->intent);
+		$handle_seizure = handle_seizure($input->session->user->accessToken, $input->request->intent, $timestamp);
 
 		// Set the return speech/message awkwardly
 		// (TODO: find a better way of doing this)

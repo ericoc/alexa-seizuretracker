@@ -3,7 +3,7 @@
 // Create the giant seizure object for adding or updating seizures via the SeizureTracker API
 $seizure_object = (object) array(
 	'Patient_ID'			=>	$user,
-	'Date_Time'			=>	null,
+	'Date_Time'			=>	$timestamp,
 	'length_hr'			=>	0,
 	'length_min'			=>	0,
 	'length_sec'			=>	0,
@@ -62,11 +62,11 @@ $seizure_object = (object) array(
 	'LogTriggers'			=>	'Yes',
 	'DescriptType'			=>	'SSD',
 	'LogPostDescript'		=>	'Yes',
-	'DateTimeEntered'		=>	null,
+	'DateTimeEntered'		=>	$timestamp,
 	'EventLocationLNG'		=>	'',
 	'EventLocationLAT'		=>	'',
 	'GUID'				=>	'',
-	'LastUpdated'			=>	null
+	'LastUpdated'			=>	$timestamp
 );
 
 // SeizureTracker.com API credentials/settings
@@ -81,6 +81,5 @@ $st_api = (object) array(
 	'seizure'	=>	$seizure_object,
 	'timeout'	=>	2,
 	'returnxfer'	=>	1,
-	'timestamp'	=>	date('Y-m-d H:i:s'),
-	'gmt_timestamp'	=>	gmdate('Y-m-d H:i:s')
+	'timestamp'	=>	$timestamp
 );

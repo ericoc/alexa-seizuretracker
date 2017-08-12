@@ -9,9 +9,6 @@ function calculate_seizure_length ($start, $end) {
 	$start_dt = new DateTime($start);
 	$end_dt = new DateTime($end);
 	$length = $start_dt->diff($end_dt);
-	error_log('START: ' . print_r($start ,true));
-	error_log('END: ' . print_r($end, true));
-	error_log(print_r($length, true));
 	return $length;
 }
 

@@ -19,11 +19,26 @@ function calculate_seizure_length ($start, $end) {
 //   2. false - if no seizure was found in the past 48 hours
 //   3. null - if there was an API issue
 //
-function get_latest_seizure ($api, $user) {
+function get_latest_seizure ($api, $user, $open = true) {
 
 	// Set the URL for the SeizureTracker latest event API
-	error_log('GETTING LATEST SEIZURE');
-	$api->latest_event_url = $api->base_url . '/Events/LastOpenEvent.php/JSON/' . $api->access_code . '/' . $user . '/';
+	error_log('GETTING LATEST SEIZURE / OPEN: ' . $open);
+
+	// Hit the correct end point based on whether we want the latest open seizure event or not
+	if ($open === true) {
+		$api->latest_event_url = $api->base_url . '/Events/LastOpenEvent.php/JSON/' . $api->access_code . '/' . $user . '/';
+
+	} else {
+
+		// Figure out the date range we want
+		$unix_timestamp = strtotime($api->timestamp);
+		$yesterday = date('Y-m-d', $unix_timestamp-86400);
+		$tomorrow = date('Y-m-d', $unix_timestamp+86400);
+
+		// Set the endpoint to retrieve seizure events between tomorrow and yesterday
+		$api->latest_event_url = $api->base_url . '/Events/Events.php/JSON/' . $api->access_code . '/' . $user;
+		$api->latest_event_url .= '/?Length=DateRange&Date=' . $tomorrow . '&StartDate=' . $yesterday;
+	}
 
 	// Hit the SeizureTracker API to find the users latest seizure
 	$c = curl_init();
@@ -42,15 +57,36 @@ function get_latest_seizure ($api, $user) {
 		return false;
 	}
 
+	// Fix the JSON in the end of the response when looking for seizures that are not open events...
+	// NOTE: The API is returning invalid JSON by throwing a comma at the end unncessarily.
+	if ($open !== true) {
+		$pattern = '/\},\]\}/';
+		$replace = '}]}';
+		$body = preg_replace($pattern, $replace, $r);
+	} else {
+		$body = $r;
+	}
+
 	// Proceed only if the latest seizure JSON object actually contains an item
-	$seizure = json_decode($r);
-	if ( (isset($seizure)) && (!empty($seizure)) ) {
-		$seizure = $seizure->LastOpenSeizure[0];
-		error_log(print_r($seizure, true));
+	$seizures = json_decode($body);
+	if ( (isset($seizures)) && (!empty($seizures)) ) {
+
+		// Decide what to return whether we are retrieving open seizure events or not
+		if ($open === true) {
+			$seizure = $seizures->LastOpenSeizure[0];
+		} else {
+			$seizure = end($seizures->Seizures);
+		}
+
 		return $seizure;
+
+	// If there is an empty object, log why the JSON could not be decoded
+	} else {
+		error_log('JSON DECODE FAILED?' . json_last_error_msg());
 	}
 
 	// If we got to this point, something went wrong
+	error_log('GETTING LATEST SEIZURE FAILED: ' . "($code) $body");
 	return null;
 }
 
@@ -59,12 +95,36 @@ function get_latest_seizure ($api, $user) {
 //
 function add_seizure ($api, $user) {
 
+	// Try to get the latest seizure (open or not) to copy its parameters/values
+	$last_seizure = get_latest_seizure($api, $user, false);
+
+	// If there was a prior seizure we can build off of, let's do that
+	if ( (isset($last_seizure)) && (is_object($last_seizure)) ) {
+
+		error_log('USING LAST SEIZURE AS TEMPLATE');
+
+		// Blank the GUID and fix up the timestamps and length values on the seizure object we got
+		$new_seizure = $last_seizure;
+		$new_seizure->length_sec = 0;
+		$new_seizure->length_sec = 0;
+		$new_seizure->length_sec = 0;
+		$new_seizure->Date_Time = $api->timestamp;
+		$new_seizure->DateTimeEntered = $api->timestamp;
+		$new_seizure->LastUpdated = $api->timestamp;
+		$new_seizure->GUID = '';
+
+	// Otherwise, just use a minimal/blank seizure object
+	} else {
+		error_log('STARTING FROM A MINIMAL/EMPTY SEIZURE');
+		$new_seizure = $api->seizure;
+	}
+
+	// Build the seizure object as JSON
+	$build_seizure = (object) array('Seizures' => array($new_seizure));
+	$seizure_json = json_encode($build_seizure, JSON_PRETTY_PRINT);
+
 	// Set the URL for the SeizureTracker events API
 	$api->events_url = $api->base_url . '/Events/Events.php/JSON/' . $api->access_code . '/' . $user;
-
-	// Use current timestamp and build the seizure object as JSON
-	$build_seizure = (object) array('Seizures' => array($api->seizure));
-	$seizure_json = json_encode($build_seizure, JSON_PRETTY_PRINT);
 
 	// HTTP request headers for hitting the SeizureTracker API
 	$headers = array('Content-type: application/json', 'Content-Length: ' . strlen($seizure_json));

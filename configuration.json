@@ -3,9 +3,6 @@
     {
       "name": "AddSeizure",
       "samples": [
-        "{Name} is having a {SeizureWord}",
-        "{Name} having a {SeizureWord}",
-        "{Action} {Name} {SeizureWord}",
         "{Action} a {SeizureWord}",
         "I'm having a {SeizureWord}",
         "I am having a {SeizureWord}"
@@ -19,11 +16,6 @@
         {
           "name": "SeizureWord",
           "type": "SEIZURE_WORDS",
-          "samples": []
-        },
-        {
-          "name": "Name",
-          "type": "AMAZON.US_FIRST_NAME",
           "samples": []
         }
       ]
@@ -57,15 +49,11 @@
         "{CountWord} my {SeizureWords} today",
         "{CountWord} the {SeizureWords}",
         "{CountWord} the {SeizureWords} today",
-        "{CountWord} {Name} {SeizureWords}",
-        "{CountWord} {Name} {SeizureWords} today",
         "{CountWord} his {SeizureWords} today",
         "{CountWord} her {SeizureWords} today",
         "{CountWord} {SeizureWords} have I had",
         "{CountWord} {SeizureWords} have I had today",
         "{CountWord} {SeizureWords} have they had today",
-        "{CountWord} {SeizureWords} has {Name} had",
-        "{CountWord} {SeizureWords} has {Name} had today",
         "{CountWord} {SeizureWords} has he had",
         "{CountWord} {SeizureWords} has he had today",
         "{CountWord} {SeizureWords} has she had",
@@ -81,11 +69,6 @@
           "name": "CountWord",
           "type": "COUNT_WORDS",
           "samples": []
-        },
-        {
-          "name": "Name",
-          "type": "AMAZON.US_FIRST_NAME",
-          "samples": []
         }
       ]
     },
@@ -100,11 +83,7 @@
         "the {Thing} {EndWord}",
         "the {Thing} is {EndWord}",
         "the {Thing} has {EndWord}",
-        "the {SeizureWords} {EndWord}",
-        "{Name} {Thing} {EndWord}",
-        "{Name} {Thing} is {EndWord}",
-        "{Name} {Thing} has {EndWord}",
-        "{Name} {SeizureWords} {EndWord}"
+        "the {SeizureWords} {EndWord}"
       ],
       "slots": [
         {
@@ -120,11 +99,6 @@
         {
           "name": "EndWord",
           "type": "END_WORDS",
-          "samples": []
-        },
-        {
-          "name": "Name",
-          "type": "AMAZON.US_FIRST_NAME",
           "samples": []
         }
       ]

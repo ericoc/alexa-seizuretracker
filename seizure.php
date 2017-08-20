@@ -83,8 +83,10 @@ if ( (!isset($input->request->timestamp)) || (empty(trim($input->request->timest
 	error_log('NO INTENT RECEIVED');
 }
 
-// Build the card for Alexa
-$card = alexa_build_card($card_content);
+// Build the card for Alexa, unless it was already created
+if (!isset($card)) {
+	$card = alexa_build_card($card_content);
+}
 
 // Build the final complete JSON response to be sent to Amazon/Alexa including the card and message
 $out = alexa_out($message, $card, null, $end_session);

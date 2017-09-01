@@ -8,6 +8,8 @@
 * DONE! ~~need to be able to update end date of most recent seizure within `EndSeizure` intent (`end_seizure` function)~~
 * [DONE!](https://www.amazon.com/Seizure-Tracker/dp/B074HBVHRJ/) ~~actually get it submitted to Amazon for certification and hopefully get published as an Alexa Skill for any one to use maybe?!~~
 
+ALL DONE :D
+
 ---
 
 #### others

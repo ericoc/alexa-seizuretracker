@@ -13,16 +13,16 @@ The request is then usually forwarded to the `handle_seizure` PHP function withi
 There are three primary functions within [seizure.events.php](seizure.events.php) (which is called by [seizure.php](seizure.php)) that interact with the SeizureTracker.com API to do the following things via Alexa voice commands:
 
   * Count seizures that have occurred today
-    - Alexa intent: `CountSeizures`
-    - PHP function: `count_seizures`
+    * Alexa intent: `CountSeizures`
+    * PHP function: `count_seizures`
 
   * Track a new seizure
-    - Alexa intent `AddSeizure`
-    - PHP function: `add_seizure`
+    * Alexa intent `AddSeizure`
+    * PHP function: `add_seizure`
 
   * Mark a (previously tracked) seizure as having ended
-    - Alexa intent: `EndSeizure`
-      PHP function: `end_seizure`
+    * Alexa intent: `EndSeizure`
+    * PHP function: `end_seizure`
 
 ### Account linking
 

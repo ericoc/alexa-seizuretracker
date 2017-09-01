@@ -6,7 +6,7 @@
 * DONE! ~~Account Linkage to SeizureTracker.com~~ see [login.php](login.php)
 * DONE! ~~add seizures~~ see `add_seizure` function within [seizure.events.php](seizure.events.php)
 * DONE! ~~need to be able to update end date of most recent seizure within `EndSeizure` intent (`end_seizure` function)~~
-* **actually get it submitted to Amazon for certification and hopefully get published as an Alexa Skill for any one to use maybe?!**
+* [DONE!](https://www.amazon.com/Seizure-Tracker/dp/B074HBVHRJ/) ~~actually get it submitted to Amazon for certification and hopefully get published as an Alexa Skill for any one to use maybe?!~~
 
 ---
 

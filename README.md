@@ -18,7 +18,7 @@ Linking an Amazon Alexa account to a SeizureTracker.com account is done within [
 
 When a voice command is made to the Seizure Tracker Alexa skill, Amazon POSTs JSON HTTPS requests to [seizure.php](seizure.php) - which includes the users "intent" as determined by Amazon.
 
-Amazon determines a users intent using a custom configured defined for the skill by the skill developer. In this case, the JSON configuration for the intent model is defined per [configuration.json](configuration.json).
+Amazon determines a users intent using a custom JSON configuration defined for the skill by the skill developer. In this case, the JSON configuration for the intent model is defined per [configuration.json](configuration.json).
 
 If a voice command request is valid and for one of the three primary functions of the skill, then the contents of a request is forwarded from [seizure.php](seizure.php) to the `handle_seizure` PHP function within [seizure.events.php](seizure.events.php).
 

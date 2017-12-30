@@ -225,8 +225,8 @@ function add_seizure ($api, $user) {
 function add_vns ($api, $user) {
 
 	// TODO
-	return 'Sorry. This feature is still being added.';
-
+	$return = 'Sorry. This feature is still being added.';
+	return $return;
 }
 
 //
@@ -347,6 +347,9 @@ function handle_seizure ($user, $intent, $timestamp) {
 		// Try to tie the users latest open seizure event to this VNS request
 		error_log('VNS USED');
 		$add_vns = add_vns($st_api, $user);
+
+		// TODO: remove this.
+		$return = $add_vns;
 
 		// All set; seizure was updated with VNS usage
 		if ($add_vns === true) {

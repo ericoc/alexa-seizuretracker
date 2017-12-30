@@ -225,7 +225,7 @@ function add_seizure ($api, $user) {
 function add_vns ($api, $user) {
 
 	// TODO
-	return null;
+	return 'Sorry. This feature is still being added.';
 
 }
 

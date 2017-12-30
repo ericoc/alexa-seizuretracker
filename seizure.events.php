@@ -218,6 +218,16 @@ function add_seizure ($api, $user) {
 	return null;
 }
 
+//
+// Create a function to relate VNS usage to an existing open seizure event
+//
+
+function add_vns ($api, $user) {
+
+	// TODO
+	return null;
+
+}
 
 //
 // Create a function to mark a seizure as having ended

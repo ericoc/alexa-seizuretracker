@@ -91,6 +91,64 @@ function get_latest_seizure ($api, $user, $open = true) {
 }
 
 //
+// Create a function to count the number of seizures for a user today
+//
+function count_seizures ($api, $user) {
+
+	$unix_timestamp = strtotime($api->timestamp);
+	$yesterday = date('Y-m-d', $unix_timestamp-86400);
+	$tomorrow = date('Y-m-d', $unix_timestamp+86400);
+
+	// Set the URL for the SeizureTracker events API
+	$api->events_url = $api->base_url . '/Events/Events.php/JSON/' . $api->access_code . '/' . $user;
+	$api->events_url .= '/?Length=DateRange&Date=' . $tomorrow . '&StartDate=' . $yesterday;
+
+	// Hit the SeizureTracker API to retrieve seizures
+	$c = curl_init();
+	curl_setopt($c, CURLOPT_URL, $api->events_url);
+	curl_setopt($c, CURLOPT_RETURNTRANSFER, $api->returnxfer);
+	curl_setopt($c, CURLOPT_USERAGENT, $api->user_agent);
+	curl_setopt($c, CURLOPT_CONNECTTIMEOUT, $api->timeout);
+	curl_setopt($c, CURLOPT_TIMEOUT, $api->timeout);
+	curl_setopt($c, CURLOPT_USERPWD, $api->user_name . ':' . $api->pass_code);
+	$r = curl_exec($c);
+	$code = curl_getinfo($c, CURLINFO_HTTP_CODE);
+	curl_close($c);
+
+	// Seizure count starts at zero
+	$seizure_count = (int) 0;
+
+	// Proceed if the API responded with a 200 or 201
+	if ( ($code === 200) || ($code === 201) ) {
+
+		// Do not bother if the API did not give any seizures back
+		if ($r !== 'No events were found in time period.') {
+
+		        // Fix the JSON in the end of the response when looking for seizures that are not open events...
+		        // NOTE: The API is returning invalid JSON by throwing a comma at the end unncessarily.
+	                $pattern = '/\},\]\}/';
+	                $replace = '}]}';
+	                $body = preg_replace($pattern, $replace, $r);
+
+			// Proceed only if the seizures JSON object actually contains items
+			$seizures = json_decode($body);
+			$seizures = $seizures->Seizures;
+			if ( (isset($seizures)) && (!empty($seizures)) ) {
+				$seizure_count = count($seizures);
+			}
+		}
+
+	// If the API did not give a 200 or 201, something weird happened
+	} else {
+		return null;
+	}
+
+	// Return seizure_count
+	return (int) $seizure_count;
+
+}
+
+//
 // Create a function to add a seizure
 //
 function add_seizure ($api, $user) {
@@ -160,63 +218,6 @@ function add_seizure ($api, $user) {
 	return null;
 }
 
-//
-// Create a function to count the number of seizures for a user today
-//
-function count_seizures ($api, $user) {
-
-	$unix_timestamp = strtotime($api->timestamp);
-	$yesterday = date('Y-m-d', $unix_timestamp-86400);
-	$tomorrow = date('Y-m-d', $unix_timestamp+86400);
-
-	// Set the URL for the SeizureTracker events API
-	$api->events_url = $api->base_url . '/Events/Events.php/JSON/' . $api->access_code . '/' . $user;
-	$api->events_url .= '/?Length=DateRange&Date=' . $tomorrow . '&StartDate=' . $yesterday;
-
-	// Hit the SeizureTracker API to retrieve seizures
-	$c = curl_init();
-	curl_setopt($c, CURLOPT_URL, $api->events_url);
-	curl_setopt($c, CURLOPT_RETURNTRANSFER, $api->returnxfer);
-	curl_setopt($c, CURLOPT_USERAGENT, $api->user_agent);
-	curl_setopt($c, CURLOPT_CONNECTTIMEOUT, $api->timeout);
-	curl_setopt($c, CURLOPT_TIMEOUT, $api->timeout);
-	curl_setopt($c, CURLOPT_USERPWD, $api->user_name . ':' . $api->pass_code);
-	$r = curl_exec($c);
-	$code = curl_getinfo($c, CURLINFO_HTTP_CODE);
-	curl_close($c);
-
-	// Seizure count starts at zero
-	$seizure_count = (int) 0;
-
-	// Proceed if the API responded with a 200 or 201
-	if ( ($code === 200) || ($code === 201) ) {
-
-		// Do not bother if the API did not give any seizures back
-		if ($r !== 'No events were found in time period.') {
-
-		        // Fix the JSON in the end of the response when looking for seizures that are not open events...
-		        // NOTE: The API is returning invalid JSON by throwing a comma at the end unncessarily.
-	                $pattern = '/\},\]\}/';
-	                $replace = '}]}';
-	                $body = preg_replace($pattern, $replace, $r);
-
-			// Proceed only if the seizures JSON object actually contains items
-			$seizures = json_decode($body);
-			$seizures = $seizures->Seizures;
-			if ( (isset($seizures)) && (!empty($seizures)) ) {
-				$seizure_count = count($seizures);
-			}
-		}
-
-	// If the API did not give a 200 or 201, something weird happened
-	} else {
-		return null;
-	}
-
-	// Return seizure_count
-	return (int) $seizure_count;
-
-}
 
 //
 // Create a function to mark a seizure as having ended

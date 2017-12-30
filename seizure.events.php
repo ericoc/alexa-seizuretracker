@@ -342,7 +342,7 @@ function handle_seizure ($user, $intent, $timestamp) {
 		}
 
 	// Relate the use of a VNS stimulator to the latest open seizure event, if requested
-	} elseif ($intent->name == 'VNSUse') {
+	} elseif ($intent->name == 'AddVNS') {
 
 		// Try to tie the users latest open seizure event to this VNS request
 		error_log('VNS USED');

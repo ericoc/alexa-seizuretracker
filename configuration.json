@@ -1,267 +1,306 @@
 {
-  "intents": [
-    {
-      "name": "AddSeizure",
-      "samples": [
-        "{Action} a {SeizureWord}",
-        "I'm having a {SeizureWord}",
-        "I am having a {SeizureWord}"
-      ],
-      "slots": [
-        {
-          "name": "Action",
-          "type": "SEIZURE_ACTIONS",
-          "samples": []
-        },
-        {
-          "name": "SeizureWord",
-          "type": "SEIZURE_WORDS",
-          "samples": []
-        }
-      ]
-    },
-    {
-      "name": "AMAZON.CancelIntent",
-      "samples": []
-    },
-    {
-      "name": "AMAZON.HelpIntent",
-      "samples": []
-    },
-    {
-      "name": "AMAZON.NoIntent",
-      "samples": []
-    },
-    {
-      "name": "AMAZON.StopIntent",
-      "samples": []
-    },
-    {
-      "name": "AMAZON.YesIntent",
-      "samples": []
-    },
-    {
-      "name": "CountSeizures",
-      "samples": [
-        "{CountWord} {SeizureWords}",
-        "{CountWord} {SeizureWords} today",
-        "{CountWord} my {SeizureWords}",
-        "{CountWord} my {SeizureWords} today",
-        "{CountWord} the {SeizureWords}",
-        "{CountWord} the {SeizureWords} today",
-        "{CountWord} his {SeizureWords} today",
-        "{CountWord} her {SeizureWords} today",
-        "{CountWord} {SeizureWords} have I had",
-        "{CountWord} {SeizureWords} have I had today",
-        "{CountWord} {SeizureWords} have they had today",
-        "{CountWord} {SeizureWords} has he had",
-        "{CountWord} {SeizureWords} has he had today",
-        "{CountWord} {SeizureWords} has she had",
-        "{CountWord} {SeizureWords} has she had today"
-      ],
-      "slots": [
-        {
-          "name": "SeizureWords",
-          "type": "SEIZURE_WORDS_PLURAL",
-          "samples": []
-        },
-        {
-          "name": "CountWord",
-          "type": "COUNT_WORDS",
-          "samples": []
-        }
-      ]
-    },
-    {
-      "name": "EndSeizure",
-      "samples": [
-        "it {EndWord}",
-        "its {EndWord}",
-        "it's {EndWord}",
-        "it is {EndWord}",
-        "it has {EndWord}",
-        "the {Thing} {EndWord}",
-        "the {Thing} is {EndWord}",
-        "the {Thing} has {EndWord}",
-        "the {SeizureWords} {EndWord}"
-      ],
-      "slots": [
-        {
-          "name": "Thing",
-          "type": "SEIZURE_WORDS",
-          "samples": []
-        },
-        {
-          "name": "SeizureWords",
-          "type": "SEIZURE_WORDS_PLURAL",
-          "samples": []
-        },
-        {
-          "name": "EndWord",
-          "type": "END_WORDS",
-          "samples": []
-        }
-      ]
-    }
-  ],
-  "types": [
-    {
-      "name": "COUNT_WORDS",
-      "values": [
-        {
-          "id": null,
-          "name": {
-            "value": "how many",
-            "synonyms": []
+  "languageModel": {
+    "types": [
+      {
+        "name": "COUNT_WORDS",
+        "values": [
+          {
+            "id": null,
+            "name": {
+              "value": "how many",
+              "synonyms": []
+            }
+          },
+          {
+            "id": null,
+            "name": {
+              "value": "count",
+              "synonyms": []
+            }
           }
-        },
-        {
-          "id": null,
-          "name": {
-            "value": "count",
-            "synonyms": []
+        ]
+      },
+      {
+        "name": "END_WORDS",
+        "values": [
+          {
+            "id": null,
+            "name": {
+              "value": "over",
+              "synonyms": []
+            }
+          },
+          {
+            "id": null,
+            "name": {
+              "value": "ended",
+              "synonyms": []
+            }
+          },
+          {
+            "id": null,
+            "name": {
+              "value": "passed",
+              "synonyms": []
+            }
+          },
+          {
+            "id": null,
+            "name": {
+              "value": "finished",
+              "synonyms": []
+            }
+          },
+          {
+            "id": null,
+            "name": {
+              "value": "done",
+              "synonyms": []
+            }
+          },
+          {
+            "id": null,
+            "name": {
+              "value": "stopped",
+              "synonyms": []
+            }
+          },
+          {
+            "id": null,
+            "name": {
+              "value": "cleared",
+              "synonyms": []
+            }
           }
-        }
-      ]
-    },
-    {
-      "name": "END_WORDS",
-      "values": [
-        {
-          "id": null,
-          "name": {
-            "value": "over",
-            "synonyms": []
+        ]
+      },
+      {
+        "name": "SEIZURE_ACTIONS",
+        "values": [
+          {
+            "id": null,
+            "name": {
+              "value": "add",
+              "synonyms": []
+            }
+          },
+          {
+            "id": null,
+            "name": {
+              "value": "log",
+              "synonyms": []
+            }
+          },
+          {
+            "id": null,
+            "name": {
+              "value": "track",
+              "synonyms": []
+            }
+          },
+          {
+            "id": null,
+            "name": {
+              "value": "record",
+              "synonyms": []
+            }
+          },
+          {
+            "id": null,
+            "name": {
+              "value": "store",
+              "synonyms": []
+            }
+          },
+          {
+            "id": null,
+            "name": {
+              "value": "report",
+              "synonyms": []
+            }
           }
-        },
-        {
-          "id": null,
-          "name": {
-            "value": "ended",
-            "synonyms": []
+        ]
+      },
+      {
+        "name": "SEIZURE_WORDS",
+        "values": [
+          {
+            "id": null,
+            "name": {
+              "value": "event",
+              "synonyms": []
+            }
+          },
+          {
+            "id": null,
+            "name": {
+              "value": "seizure",
+              "synonyms": []
+            }
           }
-        },
-        {
-          "id": null,
-          "name": {
-            "value": "passed",
-            "synonyms": []
+        ]
+      },
+      {
+        "name": "SEIZURE_WORDS_PLURAL",
+        "values": [
+          {
+            "id": null,
+            "name": {
+              "value": "seizures",
+              "synonyms": []
+            }
+          },
+          {
+            "id": null,
+            "name": {
+              "value": "events",
+              "synonyms": []
+            }
           }
-        },
-        {
-          "id": null,
-          "name": {
-            "value": "finished",
-            "synonyms": []
+        ]
+      }
+    ],
+    "intents": [
+      {
+        "name": "AddSeizure",
+        "samples": [
+          "{Name} is having a {SeizureWord}",
+          "{Name} having a {SeizureWord}",
+          "{Action} {Name} {SeizureWord}",
+          "{Action} a {SeizureWord}",
+          "I'm having a {SeizureWord}",
+          "I am having a {SeizureWord}"
+        ],
+        "slots": [
+          {
+            "name": "Action",
+            "type": "SEIZURE_ACTIONS"
+          },
+          {
+            "name": "SeizureWord",
+            "type": "SEIZURE_WORDS"
+          },
+          {
+            "name": "Name",
+            "type": "AMAZON.US_FIRST_NAME"
           }
-        },
-        {
-          "id": null,
-          "name": {
-            "value": "done",
-            "synonyms": []
+        ]
+      },
+      {
+        "name": "AMAZON.CancelIntent",
+        "samples": []
+      },
+      {
+        "name": "AMAZON.HelpIntent",
+        "samples": []
+      },
+      {
+        "name": "AMAZON.NoIntent",
+        "samples": []
+      },
+      {
+        "name": "AMAZON.StopIntent",
+        "samples": []
+      },
+      {
+        "name": "AMAZON.YesIntent",
+        "samples": []
+      },
+      {
+        "name": "CountSeizures",
+        "samples": [
+          "{CountWord} {SeizureWords}",
+          "{CountWord} {SeizureWords} today",
+          "{CountWord} my {SeizureWords}",
+          "{CountWord} my {SeizureWords} today",
+          "{CountWord} the {SeizureWords}",
+          "{CountWord} the {SeizureWords} today",
+          "{CountWord} {Name} {SeizureWords}",
+          "{CountWord} {Name} {SeizureWords} today",
+          "{CountWord} his {SeizureWords} today",
+          "{CountWord} her {SeizureWords} today",
+          "{CountWord} {SeizureWords} have I had",
+          "{CountWord} {SeizureWords} have I had today",
+          "{CountWord} {SeizureWords} have they had today",
+          "{CountWord} {SeizureWords} has {Name} had",
+          "{CountWord} {SeizureWords} has {Name} had today",
+          "{CountWord} {SeizureWords} has he had",
+          "{CountWord} {SeizureWords} has he had today",
+          "{CountWord} {SeizureWords} has she had",
+          "{CountWord} {SeizureWords} has she had today"
+        ],
+        "slots": [
+          {
+            "name": "SeizureWords",
+            "type": "SEIZURE_WORDS_PLURAL"
+          },
+          {
+            "name": "CountWord",
+            "type": "COUNT_WORDS"
+          },
+          {
+            "name": "Name",
+            "type": "AMAZON.US_FIRST_NAME"
           }
-        },
-        {
-          "id": null,
-          "name": {
-            "value": "stopped",
-            "synonyms": []
+        ]
+      },
+      {
+        "name": "EndSeizure",
+        "samples": [
+          "it {EndWord}",
+          "its {EndWord}",
+          "it's {EndWord}",
+          "it is {EndWord}",
+          "it has {EndWord}",
+          "the {Thing} {EndWord}",
+          "the {Thing} is {EndWord}",
+          "the {Thing} has {EndWord}",
+          "the {SeizureWords} {EndWord}",
+          "{Name} {Thing} {EndWord}",
+          "{Name} {Thing} is {EndWord}",
+          "{Name} {Thing} has {EndWord}",
+          "{Name} {SeizureWords} {EndWord}"
+        ],
+        "slots": [
+          {
+            "name": "Thing",
+            "type": "SEIZURE_WORDS"
+          },
+          {
+            "name": "SeizureWords",
+            "type": "SEIZURE_WORDS_PLURAL"
+          },
+          {
+            "name": "EndWord",
+            "type": "END_WORDS"
+          },
+          {
+            "name": "Name",
+            "type": "AMAZON.US_FIRST_NAME"
           }
-        },
-        {
-          "id": null,
-          "name": {
-            "value": "cleared",
-            "synonyms": []
+        ]
+      },
+      {
+        "name": "AddVNS",
+        "samples": [
+          "{Name} used VNS",
+          "VNS was used",
+          "I used VNS",
+          "used VNS",
+          "activated VNS",
+          "waved VNS",
+          "triggered VNS",
+          "VNS",
+          "track VNS"
+        ],
+        "slots": [
+          {
+            "name": "Name",
+            "type": "AMAZON.US_FIRST_NAME"
           }
-        }
-      ]
-    },
-    {
-      "name": "SEIZURE_ACTIONS",
-      "values": [
-        {
-          "id": null,
-          "name": {
-            "value": "add",
-            "synonyms": []
-          }
-        },
-        {
-          "id": null,
-          "name": {
-            "value": "log",
-            "synonyms": []
-          }
-        },
-        {
-          "id": null,
-          "name": {
-            "value": "track",
-            "synonyms": []
-          }
-        },
-        {
-          "id": null,
-          "name": {
-            "value": "record",
-            "synonyms": []
-          }
-        },
-        {
-          "id": null,
-          "name": {
-            "value": "store",
-            "synonyms": []
-          }
-        },
-        {
-          "id": null,
-          "name": {
-            "value": "report",
-            "synonyms": []
-          }
-        }
-      ]
-    },
-    {
-      "name": "SEIZURE_WORDS",
-      "values": [
-        {
-          "id": null,
-          "name": {
-            "value": "event",
-            "synonyms": []
-          }
-        },
-        {
-          "id": null,
-          "name": {
-            "value": "seizure",
-            "synonyms": []
-          }
-        }
-      ]
-    },
-    {
-      "name": "SEIZURE_WORDS_PLURAL",
-      "values": [
-        {
-          "id": null,
-          "name": {
-            "value": "seizures",
-            "synonyms": []
-          }
-        },
-        {
-          "id": null,
-          "name": {
-            "value": "events",
-            "synonyms": []
-          }
-        }
-      ]
-    }
-  ]
+        ]
+      }
+    ],
+    "invocationName": "seizure tracker"
+  }
 }

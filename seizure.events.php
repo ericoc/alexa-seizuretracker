@@ -221,12 +221,64 @@ function add_seizure ($api, $user) {
 //
 // Create a function to relate VNS usage to an existing open seizure event
 //
-
 function add_vns ($api, $user) {
 
-	// TODO
-	$return = 'Sorry. This feature is still being added.';
-	return $return;
+
+	// Hit the SeizureTracker API to retrieve the latest (open) seizure so that we can add a VNS swipe to it
+	$latest_seizure = get_latest_seizure($api, $user);
+
+	// If no object was found, there were no seizures found recently so do not bother continuing
+	if ( (isset($latest_seizure)) && (!is_object($latest_seizure)) ) {
+		return false;
+
+	// Otherwise, begin modifying the object for the latest seizure so that it can be updated
+	} else {
+		$vns_seizure = $latest_seizure;
+	}
+
+	// Update the seizure event object with VNS swipe information
+	$vns_seizure->VNSProfileDate_Active = 'Yes';
+	$vns_seizure->VNS_MagnetUsed = 'Yes';
+
+	// Fix the "LastUpdated" timestamp within the seizure object
+	$update_seizure->LastUpdated = $api->timestamp;
+
+	// TODO; remove this, dump the modified object to error log for debugging
+	error_log(print_r($vns_seizure, true));
+
+	// Build the updated seizure object as JSON
+	$build_seizure = (object) array('Seizures' => array($vns_seizure));
+	$seizure_json = json_encode($build_seizure, JSON_PRETTY_PRINT);
+
+	// HTTP request headers for hitting the SeizureTracker API
+	$headers = array('Content-type: application/json', 'Content-Length: ' . strlen($seizure_json));
+
+	// Hit the SeizureTracker API to add the VNS information to the seizure
+	$api->events_url = $api->base_url . '/Events/Events.php/JSON/' . $api->access_code . '/' . $user;
+	$c = curl_init();
+	curl_setopt($c, CURLOPT_URL, $api->events_url);
+	curl_setopt($c, CURLOPT_HTTPHEADER, $headers);
+	curl_setopt($c, CURLOPT_CUSTOMREQUEST, 'PUT');
+	curl_setopt($c, CURLOPT_POSTFIELDS, $seizure_json);
+	curl_setopt($c, CURLOPT_RETURNTRANSFER, $api->returnxfer);
+	curl_setopt($c, CURLOPT_USERAGENT, $api->user_agent);
+	curl_setopt($c, CURLOPT_CONNECTTIMEOUT, $api->timeout);
+	curl_setopt($c, CURLOPT_TIMEOUT, $api->timeout);
+	curl_setopt($c, CURLOPT_USERPWD, $api->user_name . ':' . $api->pass_code);
+	$r = curl_exec($c);
+	$code = curl_getinfo($c, CURLINFO_HTTP_CODE);
+	curl_close($c);
+
+	// Proceed in checking that the seizure was successfully updated
+	if ( ($code === 202) || ($r === '1 events have been edited on your SeizureTracker.com account.') ) {
+		return true;
+	} else {
+		error_log("ADDING VNS FAILED: ($code) $r");
+	}
+
+	// If we got to this point, something went wrong
+	return null;
+
 }
 
 //
@@ -234,7 +286,7 @@ function add_vns ($api, $user) {
 //
 function end_seizure ($api, $user) {
 
-	// Hit the SeizureTracker API to retrieve the latest seizure so that we can mark it as over
+	// Hit the SeizureTracker API to retrieve the latest (open) seizure so that we can mark it as over
 	$latest_seizure = get_latest_seizure($api, $user);
 
 	// If no object was found, there were no seizures found recently to mark as being over so do not bother continuing
@@ -345,11 +397,8 @@ function handle_seizure ($user, $intent, $timestamp) {
 	} elseif ($intent->name == 'AddVNS') {
 
 		// Try to tie the users latest open seizure event to this VNS request
-		error_log('VNS USED');
+		error_log('ADDING VNS');
 		$add_vns = add_vns($st_api, $user);
-
-		// TODO: remove this.
-		$return = $add_vns;
 
 		// All set; seizure was updated with VNS usage
 		if ($add_vns === true) {

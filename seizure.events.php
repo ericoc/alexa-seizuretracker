@@ -91,6 +91,64 @@ function get_latest_seizure ($api, $user, $open = true) {
 }
 
 //
+// Create a function to count the number of seizures for a user today
+//
+function count_seizures ($api, $user) {
+
+	$unix_timestamp = strtotime($api->timestamp);
+	$yesterday = date('Y-m-d', $unix_timestamp-86400);
+	$tomorrow = date('Y-m-d', $unix_timestamp+86400);
+
+	// Set the URL for the SeizureTracker events API
+	$api->events_url = $api->base_url . '/Events/Events.php/JSON/' . $api->access_code . '/' . $user;
+	$api->events_url .= '/?Length=DateRange&Date=' . $tomorrow . '&StartDate=' . $yesterday;
+
+	// Hit the SeizureTracker API to retrieve seizures
+	$c = curl_init();
+	curl_setopt($c, CURLOPT_URL, $api->events_url);
+	curl_setopt($c, CURLOPT_RETURNTRANSFER, $api->returnxfer);
+	curl_setopt($c, CURLOPT_USERAGENT, $api->user_agent);
+	curl_setopt($c, CURLOPT_CONNECTTIMEOUT, $api->timeout);
+	curl_setopt($c, CURLOPT_TIMEOUT, $api->timeout);
+	curl_setopt($c, CURLOPT_USERPWD, $api->user_name . ':' . $api->pass_code);
+	$r = curl_exec($c);
+	$code = curl_getinfo($c, CURLINFO_HTTP_CODE);
+	curl_close($c);
+
+	// Seizure count starts at zero
+	$seizure_count = (int) 0;
+
+	// Proceed if the API responded with a 200 or 201
+	if ( ($code === 200) || ($code === 201) ) {
+
+		// Do not bother if the API did not give any seizures back
+		if ($r !== 'No events were found in time period.') {
+
+		        // Fix the JSON in the end of the response when looking for seizures that are not open events...
+		        // NOTE: The API is returning invalid JSON by throwing a comma at the end unncessarily.
+	                $pattern = '/\},\]\}/';
+	                $replace = '}]}';
+	                $body = preg_replace($pattern, $replace, $r);
+
+			// Proceed only if the seizures JSON object actually contains items
+			$seizures = json_decode($body);
+			$seizures = $seizures->Seizures;
+			if ( (isset($seizures)) && (!empty($seizures)) ) {
+				$seizure_count = count($seizures);
+			}
+		}
+
+	// If the API did not give a 200 or 201, something weird happened
+	} else {
+		return null;
+	}
+
+	// Return seizure_count
+	return (int) $seizure_count;
+
+}
+
+//
 // Create a function to add a seizure
 //
 function add_seizure ($api, $user) {
@@ -161,21 +219,47 @@ function add_seizure ($api, $user) {
 }
 
 //
-// Create a function to count the number of seizures for a user today
+// Create a function to relate VNS usage to an existing open seizure event
 //
-function count_seizures ($api, $user) {
+function add_vns ($api, $user) {
 
-	$unix_timestamp = strtotime($api->timestamp);
-	$yesterday = date('Y-m-d', $unix_timestamp-86400);
-	$tomorrow = date('Y-m-d', $unix_timestamp+86400);
 
-	// Set the URL for the SeizureTracker events API
+	// Hit the SeizureTracker API to retrieve the latest (open) seizure so that we can add a VNS swipe to it
+	$latest_seizure = get_latest_seizure($api, $user);
+
+	// If no object was found, there were no seizures found recently so do not bother continuing
+	if ( (isset($latest_seizure)) && (!is_object($latest_seizure)) ) {
+		return false;
+
+	// Otherwise, begin modifying the object for the latest seizure so that it can be updated
+	} else {
+		$vns_seizure = $latest_seizure;
+	}
+
+	// Update the seizure event object with VNS swipe information
+	$vns_seizure->VNSProfileDate_Active = 'Yes';
+	$vns_seizure->VNS_MagnetUsed = 'Yes';
+
+	// Fix the "LastUpdated" timestamp within the seizure object
+	$update_seizure->LastUpdated = $api->timestamp;
+
+	// TODO; remove this, dump the modified object to error log for debugging
+	error_log(print_r($vns_seizure, true));
+
+	// Build the updated seizure object as JSON
+	$build_seizure = (object) array('Seizures' => array($vns_seizure));
+	$seizure_json = json_encode($build_seizure, JSON_PRETTY_PRINT);
+
+	// HTTP request headers for hitting the SeizureTracker API
+	$headers = array('Content-type: application/json', 'Content-Length: ' . strlen($seizure_json));
+
+	// Hit the SeizureTracker API to add the VNS information to the seizure
 	$api->events_url = $api->base_url . '/Events/Events.php/JSON/' . $api->access_code . '/' . $user;
-	$api->events_url .= '/?Length=DateRange&Date=' . $tomorrow . '&StartDate=' . $yesterday;
-
-	// Hit the SeizureTracker API to retrieve seizures
 	$c = curl_init();
 	curl_setopt($c, CURLOPT_URL, $api->events_url);
+	curl_setopt($c, CURLOPT_HTTPHEADER, $headers);
+	curl_setopt($c, CURLOPT_CUSTOMREQUEST, 'PUT');
+	curl_setopt($c, CURLOPT_POSTFIELDS, $seizure_json);
 	curl_setopt($c, CURLOPT_RETURNTRANSFER, $api->returnxfer);
 	curl_setopt($c, CURLOPT_USERAGENT, $api->user_agent);
 	curl_setopt($c, CURLOPT_CONNECTTIMEOUT, $api->timeout);
@@ -185,36 +269,15 @@ function count_seizures ($api, $user) {
 	$code = curl_getinfo($c, CURLINFO_HTTP_CODE);
 	curl_close($c);
 
-	// Seizure count starts at zero
-	$seizure_count = (int) 0;
-
-	// Proceed if the API responded with a 200 or 201
-	if ( ($code === 200) || ($code === 201) ) {
-
-		// Do not bother if the API did not give any seizures back
-		if ($r !== 'No events were found in time period.') {
-
-		        // Fix the JSON in the end of the response when looking for seizures that are not open events...
-		        // NOTE: The API is returning invalid JSON by throwing a comma at the end unncessarily.
-	                $pattern = '/\},\]\}/';
-	                $replace = '}]}';
-	                $body = preg_replace($pattern, $replace, $r);
-
-			// Proceed only if the seizures JSON object actually contains items
-			$seizures = json_decode($body);
-			$seizures = $seizures->Seizures;
-			if ( (isset($seizures)) && (!empty($seizures)) ) {
-				$seizure_count = count($seizures);
-			}
-		}
-
-	// If the API did not give a 200 or 201, something weird happened
+	// Proceed in checking that the seizure was successfully updated
+	if ( ($code === 202) || ($r === '1 events have been edited on your SeizureTracker.com account.') ) {
+		return true;
 	} else {
-		return null;
+		error_log("ADDING VNS FAILED: ($code) $r");
 	}
 
-	// Return seizure_count
-	return (int) $seizure_count;
+	// If we got to this point, something went wrong
+	return null;
 
 }
 
@@ -223,7 +286,7 @@ function count_seizures ($api, $user) {
 //
 function end_seizure ($api, $user) {
 
-	// Hit the SeizureTracker API to retrieve the latest seizure so that we can mark it as over
+	// Hit the SeizureTracker API to retrieve the latest (open) seizure so that we can mark it as over
 	$latest_seizure = get_latest_seizure($api, $user);
 
 	// If no object was found, there were no seizures found recently to mark as being over so do not bother continuing
@@ -328,6 +391,26 @@ function handle_seizure ($user, $intent, $timestamp) {
 		// Otherwise, something went wrong trying to add the seizure
 		} else {
 			$return = 'Sorry. There was an error tracking the seizure.';
+		}
+
+	// Relate the use of a VNS stimulator to the latest open seizure event, if requested
+	} elseif ($intent->name == 'AddVNS') {
+
+		// Try to tie the users latest open seizure event to this VNS request
+		error_log('ADDING VNS');
+		$add_vns = add_vns($st_api, $user);
+
+		// All set; seizure was updated with VNS usage
+		if ($add_vns === true) {
+			$return = 'Okay. The VNS usage was saved.';
+
+		// No seizure could be found to relate to this VNS usage
+		} elseif ($add_vns === false) {
+			$return = 'Sorry. No seizure could be found.';
+
+		// No seizure was found or something weird happened?
+		} elseif ($add_vns === null) {
+			$return = 'Sorry. There was an unknown error.';
 		}
 
 	// Mark a seizure as having ended, if requested

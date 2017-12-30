@@ -12,11 +12,14 @@ ALL DONE :D
 
 ---
 
+
 #### others
 
+* IN PROGRESS: track VNS swipes/usage
+* track whether medication was taken
 * `class{}`-y PHP would be great...
 * perhaps do some other stuff with Flash Briefing which announces count of seizures for the prior day...?
-*  somehow make `handle_seizure()` cooler instead of just treating whatever string it returns as success
+* somehow make `handle_seizure()` cooler instead of just treating whatever string it returns as success
 * maybe do more intense checking on phrases received from Alexa?
   - it absolutely cannot do proper voice-to-text on the word *"ended"* no matter how I pronounce it!
       * I've gotten back *"and 8"*, *"I ate and"*, and all kinds of crazy stuff that's not even close

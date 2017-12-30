@@ -20,26 +20,16 @@ When a voice command is made to the Seizure Tracker Alexa skill, Amazon POSTs JS
 
 Amazon determines a users intent using a custom JSON configuration defined for the skill by the skill developer. In this case, the JSON configuration for the intent model is defined per [configuration.json](configuration.json).
 
-If a voice command request is valid and for one of the three primary functions of the skill, then the contents of a request is forwarded from [seizure.php](seizure.php) to the `handle_seizure` PHP function within [seizure.events.php](seizure.events.php).
+If a voice command request is valid and for one of the four primary functions of the skill, then the contents of a request is forwarded from [seizure.php](seizure.php) to the `handle_seizure` PHP function within [seizure.events.php](seizure.events.php).
 
 ##### Primary functions
 
-There are three primary functions within [seizure.events.php](seizure.events.php) (which is called by [seizure.php](seizure.php)) that interact with the SeizureTracker.com API to do the following things via Alexa voice commands:
+There are four primary functions within [seizure.events.php](seizure.events.php) (which is called by [seizure.php](seizure.php)) that interact with the SeizureTracker.com API to do the following things via Alexa voice commands:
 
 | Alexa Intent    | PHP Function      | Purpose                                             |
 | --------------- | ----------------- | --------------------------------------------------- |
 | `CountSeizures` | `count_seizures`  | Count seizures that have occurred today             |
 | `AddSeizure`    | `add_seizure`     | Track a new seizure                                 |
+| `AddVNS`        | `add_vns`         | Tie VNS stimulator usage/swipe to a seizure event   |
 | `EndSeizure`    | `end_seizure`     | Mark a (previously tracked) seizure as having ended |
 
----
-
-### Future Plans?
-
-#### Including these capabilities could be useful:
-  * Track whether seizure medication was taken
-  * Track vagal nerve stimulator (VNS) usage
-
-#### "Flash Briefing" ideas:
-  * Medication reminder
-  * Announce count of seizures for the prior day

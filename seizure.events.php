@@ -330,6 +330,26 @@ function handle_seizure ($user, $intent, $timestamp) {
 			$return = 'Sorry. There was an error tracking the seizure.';
 		}
 
+	// Relate the use of a VNS stimulator to the latest open seizure event, if requested
+	} elseif ($intent->name == 'VNSUse') {
+
+		// Try to tie the users latest open seizure event to this VNS request
+		error_log('VNS USED');
+		$add_vns = add_vns($st_api, $user);
+
+		// All set; seizure was updated with VNS usage
+		if ($add_vns === true) {
+			$return = 'Okay. The VNS usage was saved.';
+
+		// No seizure could be found to relate to this VNS usage
+		} elseif ($add_vns === false) {
+			$return = 'Sorry. No seizure could be found.';
+
+		// No seizure was found or something weird happened?
+		} elseif ($add_vns === null) {
+			$return = 'Sorry. There was an unknown error.';
+		}
+
 	// Mark a seizure as having ended, if requested
 	} elseif ($intent->name == 'EndSeizure') {
 
